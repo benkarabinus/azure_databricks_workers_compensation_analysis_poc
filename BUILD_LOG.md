@@ -4,7 +4,8 @@
 
 ## Current status
 
-- **Phase:** Repo customization complete; **scaffolding not yet started.**
+- **Phase:** Customization complete; **scaffolding in progress (step 1 done).**
+- **Local env:** project **`.venv`** (Python 3.12) holds data-gen/dev deps from `requirements.txt`. Do NOT install into system Python. Activate with `.venv\Scripts\python`.
 - **Primary instructions:** `.github/copilot-instructions.md` is the source of truth for structure, sessions, architecture, and conventions.
 - **Reference (do not ship):** `state-fund-lane1-poc-implementation-plan.md` — full design (ERD, column lineage, sample data, ML plan). Keep for scaffolding context.
 
@@ -29,7 +30,7 @@
 
 ## Planned build order (TODO)
 
-1. `common/config.py` + `data/generate_synthetic_data.py` (everything depends on the synthetic sources).
+1. ✅ `common/config.py` + `data/generate_synthetic_data.py` (+ `requirements.txt`, `.gitignore`, `.venv`). Smoke-tested at 100 claims.
 2. `README.md` + `DEPLOYMENT_GUIDE.md` skeletons; `docs/` Jekyll site (`_config.yml`, `Gemfile`, `index.md`).
 3. Session 0 — setup SQL + README.
 4. Session 1 — Bronze (catalog/schemas, Auto Loader DLT, Excel ingest).
@@ -41,4 +42,6 @@
 
 ## Log
 
+- **2026-06-19** — Generated the full synthetic dataset into `data/` at 5,000 claims (seed 42): claims_core.csv (5,101 rows w/ dupes+poison), hr_records.csv (4,000), medical_treatments.json (5,000, ~4 MB), provider_billing.json (5,000, ~2.2 MB), adjuster_notes.xlsx (2,760), siu_labels.csv (2,260 labeled, 232 fraud ≈ 10.3%). ~7 MB total.
+- **2026-06-19** — Step 1: created `common/config.py` (catalog/schema/table/path helpers), `common/__init__.py`, `data/generate_synthetic_data.py` (seeded pandas/Faker generator for all six sources w/ ~2-5% dirty patterns, nested JSONL, return_to_work events, SIU labels). Added `requirements.txt` + `.gitignore`. Created project `.venv` (Python 3.12); reverted accidental system-Python (arm64) installs. Smoke-tested generator at 100 claims — all six files produced.
 - **2026-06-19** — Authored & promoted `.github/copilot-instructions.md`; aligned pyspark/sql instruction files; added diagrams instruction file; created this build log + repo memory. Scaffolding pending.
