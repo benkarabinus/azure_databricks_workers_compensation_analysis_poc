@@ -1,0 +1,12 @@
+# Synthetic data generation + local dev tooling for the State Fund Lane 1 POC.
+# These are NOT the Databricks runtime libraries (those are provided by the
+# serverless environment). Install into a local virtual environment:
+#
+#   python -m venv .venv
+#   .venv\Scripts\python -m pip install -r requirements.txt   # Windows
+#   source .venv/bin/activate && pip install -r requirements.txt  # macOS/Linux
+#
+pandas>=2.0
+numpy>=1.26
+faker>=22.0
+openpyxl>=3.1
