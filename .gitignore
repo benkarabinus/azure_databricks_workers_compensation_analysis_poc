@@ -1,0 +1,13 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+
+# Local scratch / generated test output
+.tmp_data/
+
+# OS / editor
+.DS_Store
+Thumbs.db
