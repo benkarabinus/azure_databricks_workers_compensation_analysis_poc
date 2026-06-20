@@ -1,0 +1,8 @@
+source "https://rubygems.org"
+
+# GitHub Pages gem pins Jekyll and plugins to the versions GitHub Pages runs,
+# and supports remote_theme (used here to pull in just-the-docs).
+gem "github-pages", group: :jekyll_plugins
+
+# Required for `jekyll serve` on Ruby 3.0+ (Webrick is no longer bundled).
+gem "webrick", "~> 1.8"

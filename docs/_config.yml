@@ -1,0 +1,34 @@
+title: State Fund Lane 1 POC
+description: >-
+  Hands-on tutorial building an end-to-end medallion lakehouse on Azure
+  Databricks Serverless for workers'-compensation Return-to-Work prediction and
+  claims fraud investigation triage.
+
+# just-the-docs theme served via GitHub Pages remote_theme.
+remote_theme: just-the-docs/just-the-docs
+
+# Set baseurl to the repository name so links resolve on GitHub Pages
+# (https://<user>.github.io/<repo>/). Update if the repo is renamed.
+baseurl: "/azure_databricks_workers_compensation_analysis_poc"
+
+# Theme options
+color_scheme: light
+search_enabled: true
+heading_anchors: true
+
+# Enable Mermaid diagrams (used for the ERD on the data dictionary page).
+mermaid:
+  version: "10.6.1"
+
+# Footer / navigation
+aux_links:
+  "View on GitHub":
+    - "https://github.com/"
+nav_external_links: []
+
+# Exclude non-site files from the Jekyll build.
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - vendor
+  - images/README.md

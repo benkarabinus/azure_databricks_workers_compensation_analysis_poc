@@ -3,7 +3,7 @@
 Generates the six source files consumed by the Bronze layer:
 
     claims_core.csv         claims hub (simulates a claims DB)
-    hr_records.csv          employee / employment records (simulates SQL Server backed HRIS)
+    hr_records.csv          employee / employment records (simulates an HR DB)
     medical_treatments.json nested treatment events per claim (JSON Lines)
     provider_billing.json   nested billing lines per claim (JSON Lines, simulates EDI 837)
     adjuster_notes.xlsx     free-text adjuster notes with embedded fake PII

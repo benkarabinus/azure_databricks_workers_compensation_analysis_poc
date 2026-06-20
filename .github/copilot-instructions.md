@@ -48,8 +48,8 @@ common/                                ← Shared helpers reused across sessions
   config.py                            ← Catalog/schema/path constants resolved from widgets or job params
 data/                                  ← Synthetic source data + generator
   generate_synthetic_data.py           ← Seeded pandas/Faker generator for all six source files
-  claims_core.csv                      ← Raw claims (simulates Oracle claims DB)
-  hr_records.csv                       ← HR / employment records (simulates SQL Server HRIS)
+  claims_core.csv                      ← Raw claims (simulates a claims DB)
+  hr_records.csv                       ← HR / employment records (simulates an HR DB)
   medical_treatments.json              ← Nested treatment events per claim (simulates clinical feed)
   provider_billing.json                ← Nested billing lines per claim (simulates EDI 837)
   adjuster_notes.xlsx                  ← Free-text adjuster notes with embedded fake PII
