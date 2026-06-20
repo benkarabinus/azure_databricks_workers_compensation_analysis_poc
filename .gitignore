@@ -11,3 +11,6 @@ __pycache__/
 # OS / editor
 .DS_Store
 Thumbs.db
+
+# Internal design reference (do not ship)
+state-fund-lane1-poc-implementation-plan.md
