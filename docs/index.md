@@ -19,7 +19,7 @@ The build is split into ordered **sessions**, each a self-contained stage. Work 
 
 | Session | Focus | Key outputs |
 | --- | --- | --- |
-| **0 — Setup** | Workspace, Unity Catalog metastore, serverless, dedicated ADLS Gen2 External Location, access | Working serverless workspace |
+| **0 — Setup** | Terraform provisions a serverless workspace + dedicated ADLS Gen2 External Location (Unity Catalog auto-enabled) | Working serverless workspace |
 | **1 — Bronze** | Catalog/schemas; Auto Loader DLT (CSV/JSON) + Excel ingest | `bronze.raw_*` tables |
 | **2 — Silver** | Cleaning, DLT Expectations, PII masking, AI Functions on notes | governed `silver.*` |
 | **3 — Gold** | Feature tables, BI aggregates, lineage, Genie, AI/BI dashboard | ML-ready `gold.*` + BI |

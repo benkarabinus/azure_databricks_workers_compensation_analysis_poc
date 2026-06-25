@@ -1,0 +1,20 @@
+# Local Terraform state and secrets - keep out of git.
+# Note: .terraform.lock.hcl is intentionally NOT ignored (commit it).
+.terraform/
+*.tfstate
+*.tfstate.*
+crash.log
+crash.*.log
+
+# Variable files may contain subscription IDs / environment specifics.
+*.tfvars
+*.tfvars.json
+!*.tfvars.example
+
+# CLI config / overrides
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+.terraformrc
+terraform.rc
