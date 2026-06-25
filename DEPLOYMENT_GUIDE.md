@@ -62,11 +62,22 @@ Full step‑by‑step instructions and the design rationale are in [session-0-se
 
 ### Session 1 — Foundations & Bronze Ingestion
 
-**Goal:** Create the catalog and schemas, then land all six sources append-only via Auto Loader (CSV/JSON) and an Excel ingest notebook.
+**Goal:** Create the `state_fund_poc` catalog and its six schemas, then land all six sources append‑only into `bronze.raw_*` (Auto Loader for CSV/JSON, an Excel notebook for the `.xlsx`), each carrying `_source_file` / `_ingested_at`.
 
-**Output:** `bronze.raw_*` tables carrying `_source_file` / `_ingested_at`.
+**Output:** Six Bronze tables — `raw_claims`, `raw_hr_records`, `raw_siu_labels`, `raw_medical_treatments`, `raw_provider_billing`, and `raw_adjuster_notes` — with the dirty patterns preserved for Silver.
 
-_Detailed steps: coming soon (see `session-1-bronze/`)._
+This session is a **UI walkthrough**; you import the source files in `session-1-bronze/` and complete each step in the workspace.
+
+**Steps:**
+
+1. **Create the catalog, schemas, and landing volume:** open the **SQL editor**, paste [session-1-bronze/00_create_catalog_and_schemas.sql](session-1-bronze/00_create_catalog_and_schemas.sql), replace `<MANAGED_CATALOG_LOCATION>` and `<LANDING_LOCATION>` with the Session 0 `managed_catalog_location` and `landing_path` outputs, and run it. ([Create catalogs](https://learn.microsoft.com/azure/databricks/catalogs/create-catalog) · [CREATE VOLUME](https://learn.microsoft.com/azure/databricks/sql/language-manual/sql-ref-syntax-ddl-create-volume))
+2. **Upload the data:** in **Catalog ▸ `state_fund_poc` ▸ `bronze` ▸ Volumes ▸ `landing`**, create a folder per source (`claims`, `hr`, `siu_labels`, `treatments`, `billing`, `notes`) and upload the matching file into each. ([Upload files to a volume](https://learn.microsoft.com/azure/databricks/volumes/volume-files#use-catalog-explorer))
+3. **Import** [bronze_autoloader_pipeline.py](session-1-bronze/bronze_autoloader_pipeline.py) and [ingest_adjuster_notes_excel.py](session-1-bronze/ingest_adjuster_notes_excel.py) into the workspace. ([Manage notebooks](https://learn.microsoft.com/azure/databricks/notebooks/notebooks-manage))
+4. **Run the Bronze pipeline:** create a **Serverless ETL pipeline** from the imported pipeline notebook with default catalog `state_fund_poc` and schema `bronze`, then **Start**. ([Auto Loader](https://learn.microsoft.com/azure/databricks/ingestion/cloud-object-storage/auto-loader/) · [Build an ETL pipeline with Lakeflow](https://learn.microsoft.com/azure/databricks/getting-started/data-pipeline-get-started))
+5. **Run the Excel ingest:** create a **Serverless job** with a notebook task on the Excel notebook and **Run now**. ([Serverless jobs](https://learn.microsoft.com/azure/databricks/jobs/run-serverless-jobs))
+6. **Verify** the six `bronze.raw_*` tables and their `_source_file` / `_ingested_at` columns.
+
+Full step‑by‑step instructions and doc links are in [session-1-bronze/README.md](session-1-bronze/README.md).
 
 ### Session 2 — Silver: Cleaning, Quality & PII Governance
 

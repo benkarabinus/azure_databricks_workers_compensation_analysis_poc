@@ -29,10 +29,13 @@ from dataclasses import dataclass, field
 
 DEFAULT_CATALOG = "state_fund_poc"
 
-# Placeholder landing root. In the workshop this is the dedicated ADLS Gen2
-# account registered as a Unity Catalog External Location (see session-0). It is
-# intentionally a placeholder so it is never hard-coded into pipeline logic.
-DEFAULT_LANDING_PATH = "abfss://landing@REPLACE_ME.dfs.core.windows.net/state-fund-poc"
+# Raw source files land in a Unity Catalog external volume (best practice for
+# ingestion landing zones), created in session-1 over the session-0 `landing`
+# external location. Pipelines read from the /Volumes FUSE path below; each
+# source has its own subfolder (see source_path).
+LANDING_SCHEMA = "bronze"
+LANDING_VOLUME = "landing"
+DEFAULT_LANDING_PATH = f"/Volumes/{DEFAULT_CATALOG}/{LANDING_SCHEMA}/{LANDING_VOLUME}"
 
 # Schema names (the six UC schemas in the single POC catalog).
 SCHEMAS: tuple[str, ...] = ("bronze", "silver", "gold", "config", "security", "ml")
@@ -114,5 +117,6 @@ def get_config(dbutils=None) -> Config:
         ``catalog`` and ``landing_path`` widgets are consulted first.
     """
     catalog = _widget(dbutils, "catalog", DEFAULT_CATALOG)
-    landing_path = _widget(dbutils, "landing_path", DEFAULT_LANDING_PATH)
+    default_landing = f"/Volumes/{catalog}/{LANDING_SCHEMA}/{LANDING_VOLUME}"
+    landing_path = _widget(dbutils, "landing_path", default_landing)
     return Config(catalog=catalog, landing_path=landing_path)
