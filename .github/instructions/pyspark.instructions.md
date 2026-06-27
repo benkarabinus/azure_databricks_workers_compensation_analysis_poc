@@ -16,7 +16,7 @@ These rules apply to all Python in the State Fund Lane 1 POC (serverless Azure D
 ## Medallion layering
 
 - Respect Bronze → Silver → Gold; never read raw source straight into Gold. Bronze is raw/append-only; Silver is cleansed/conformed/masked; Gold is curated features and aggregates.
-- **Bronze:** ingest with Auto Loader (`cloudFiles`) for CSV/JSON and an `openpyxl` Serverless Job notebook for `.xlsx`. Keep nested JSON arrays intact. Add `_source_file` and `_ingested_at`; do not drop them until Silver.
+- **Bronze:** CSV/JSON are ingested by a **Lakeflow SQL pipeline** (`CREATE OR REFRESH STREAMING TABLE` + `read_files`, which invokes Auto Loader) — see [sql.instructions.md](sql.instructions.md); Python here covers only the `.xlsx` source via an `openpyxl` Serverless Job notebook. Keep nested JSON arrays intact. Add `_source_file` and `_ingested_at`; do not drop them until Silver.
 - **Silver:** clean, conform, deduplicate (latest `_ingested_at` wins), cast numerics, and parse dates to ISO `DATE`/`TIMESTAMP`. `silver.claims` is the hub; join spokes on `claim_id` (or `employee_id`).
 - **Gold:** build `rtw_features` / `fraud_features` (one row per `claim_id`) and BI aggregates.
 

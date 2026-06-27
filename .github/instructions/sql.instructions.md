@@ -21,6 +21,14 @@ These rules apply to all SQL in the State Fund Lane 1 POC (serverless Azure Data
 - Avoid `SELECT *` in curated (Gold) outputs; project only the columns required for analytics.
 - Add comments describing the medallion layer and business purpose of each table/view.
 
+## Lakeflow Spark Declarative Pipelines (SQL)
+
+- Author pipeline datasets with `CREATE OR REFRESH STREAMING TABLE` (incremental sources) or `CREATE OR REFRESH MATERIALIZED VIEW` (derived/aggregated). Use the `STREAM` keyword to read a source with streaming semantics.
+- Ingest files from the landing volume with `FROM STREAM read_files(<path>, format => '<csv|json>', ...)` — `read_files` invokes Auto Loader, and Lakeflow manages the schema location and checkpoint.
+- Keep Bronze raw: read CSV with `inferColumnTypes => false` (all strings, as-landed) and preserve nested JSON structure; add `_source_file` (`_metadata.file_path`) and `_ingested_at` (`current_timestamp()`).
+- Use **unqualified** table names so writes resolve to the pipeline's target catalog/schema; parameterize paths via the pipeline **Configuration** field (key-value) referenced with `${key}` in SQL — Serverless pipelines do **not** support a `SET` statement in source — never hard-coded environment paths.
+- Enforce data quality at the Bronze→Silver boundary with `CONSTRAINT … EXPECT (…) ON VIOLATION {DROP ROW|FAIL UPDATE}`.
+
 ## Governance & security
 
 - Define PII protection as Unity Catalog **column-mask functions** (`mask_ssn`, `mask_dob`) and **row-filter functions** in the `security` schema, then attach them to columns/tables — do not embed masking logic inline in every query.

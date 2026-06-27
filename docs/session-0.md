@@ -6,15 +6,15 @@ nav_order: 3
 
 # Session 0 — Environment Readiness (Terraform)
 
-**Goal:** Provision the Azure foundation for the POC with Terraform — a serverless‑capable
+**Goal:** Provision the Azure foundation for the POC with Terraform — a serverless
 Azure Databricks workspace plus a **dedicated ADLS Gen2 account** registered as a Unity Catalog
 **external location** (the landing zone Session 1 ingests from).
 
-**Output:** A running Premium workspace (Unity Catalog auto‑enabled, serverless available) and a
+**Output:** A running serverless workspace (Unity Catalog auto‑enabled) and a
 validated external location pointing at `abfss://landing@<storage>.dfs.core.windows.net/`.
 
-All assets live under `session-0-setup/terraform/` in the repository and are created with a single
-`terraform apply`. Tear everything down with `terraform destroy` when finished.
+All assets live under `session-0-setup/terraform/` in the repository and are created with
+`terraform apply`. Optionally tear everything down with `terraform destroy` when finished.
 
 ## What Terraform provisions
 
@@ -22,7 +22,7 @@ All assets live under `session-0-setup/terraform/` in the repository and are cre
 | --- | --- | --- |
 | Resource group | `azurerm_resource_group` (create‑or‑reuse) | Container for all POC resources |
 | ADLS Gen2 account + 2 containers | `azurerm_storage_account` (`is_hns_enabled = true`), `azurerm_storage_container` ×2 | Dedicated `landing` (raw files) + `state-fund-poc-managed` (Bronze/Silver/Gold managed tables) storage, **separate** from the metastore root |
-| Databricks workspace | `azurerm_databricks_workspace` (`sku = "premium"`) | Serverless + Unity Catalog enabled workspace |
+| Databricks workspace | `azapi_resource` (`computeMode = "Serverless"`) | True serverless workspace — no managed RG/VNet/DBFS; Unity Catalog auto‑enabled |
 | Access connector | `azurerm_databricks_access_connector` (system‑assigned identity) | Managed identity Unity Catalog uses to reach storage |
 | Role assignments | `azurerm_role_assignment` ×4 | Grant the connector’s identity blob‑data + file‑event access, and the deployer blob‑data access to create the containers |
 | Storage credential | `databricks_storage_credential` | Unity Catalog wrapper around the managed identity |
@@ -34,10 +34,12 @@ All assets live under `session-0-setup/terraform/` in the repository and are cre
   [automatically enabled for Unity Catalog](https://learn.microsoft.com/azure/databricks/data-governance/unity-catalog/get-started)
   with a storage‑less default metastore per region — so we bring our **own** ADLS account as an
   external location instead of creating a metastore.
-- **Serverless needs no enablement.**
-  [Serverless compute is available by default](https://learn.microsoft.com/azure/databricks/compute/serverless/)
-  in Unity Catalog–enabled workspaces in supported regions. The Premium SKU is required for both
-  Unity Catalog and serverless.
+- **True serverless workspace.** The workspace is created with `computeMode = "Serverless"` via the
+  [azapi](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) provider —
+  the `azurerm_databricks_workspace` resource only creates classic (“Hybrid”) workspaces. A
+  [serverless workspace](https://learn.microsoft.com/azure/databricks/admin/workspace/serverless-workspaces)
+  has **no managed resource group, VNet, or DBFS storage** in your subscription; all compute runs in
+  Databricks’ serverless plane. The Premium SKU still backs Unity Catalog, which is auto‑enabled.
 - **Managed identity, not keys.** Unity Catalog reaches the storage account through an
   [Azure managed identity](https://learn.microsoft.com/azure/databricks/connect/unity-catalog/cloud-storage/azure-managed-identities)
   on an access connector — no account keys or secrets to rotate.
@@ -144,10 +146,10 @@ Unity Catalog **metastore** for your tenant, and gives the `databricks` provider
 authenticate against:
 
 ```powershell
-terraform apply -target='azurerm_databricks_workspace.this'
+terraform apply -target='azapi_resource.workspace'
 ```
 
-> **PowerShell:** quote the target — `-target='azurerm_databricks_workspace.this'` — so the shell
+> **PowerShell:** quote the target — `-target='azapi_resource.workspace'` — so the shell
 > doesn’t split the resource address.
 
 **Between phases — assign account admin (one‑time).** Phase 2 creates Unity Catalog objects, which
