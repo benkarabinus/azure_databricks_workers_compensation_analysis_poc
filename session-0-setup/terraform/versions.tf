@@ -2,9 +2,10 @@
 #
 # Two providers are used:
 #   - azurerm    : provisions the Azure resource group, ADLS Gen2 account,
-#                  Databricks workspace, and the access connector (managed identity).
+#                  and the access connector (managed identity).
+#   - azapi      : provisions the serverless Databricks workspace (computeMode = Serverless).
 #   - databricks : registers the Unity Catalog storage credential and external
-#                  locations against the newly created workspace.
+#                  locations against the workspace.
 #   - time       : adds short propagation delays after RBAC role assignments.
 #
 # Docs:
@@ -18,6 +19,10 @@ terraform {
     azurerm = {
       source  = "hashicorp/azurerm"
       version = "~> 4.0"
+    }
+    azapi = {
+      source  = "Azure/azapi"
+      version = "~> 2.0"
     }
     databricks = {
       source  = "databricks/databricks"

@@ -7,12 +7,12 @@ output "resource_group_name" {
 
 output "workspace_url" {
   description = "Azure Databricks workspace URL. Open this to start Session 1."
-  value       = "https://${azurerm_databricks_workspace.this.workspace_url}"
+  value       = "https://${azapi_resource.workspace.output.properties.workspaceUrl}"
 }
 
 output "workspace_id" {
   description = "Azure resource ID of the Databricks workspace."
-  value       = azurerm_databricks_workspace.this.id
+  value       = azapi_resource.workspace.id
 }
 
 output "storage_account_name" {

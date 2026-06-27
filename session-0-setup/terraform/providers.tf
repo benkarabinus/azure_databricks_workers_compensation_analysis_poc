@@ -20,10 +20,17 @@ provider "azurerm" {
   subscription_id = var.subscription_id
 }
 
+# azapi talks directly to the Azure ARM API. We use it for the Databricks
+# workspace so we can set computeMode = "Serverless" - a property the azurerm
+# provider does not expose yet.
+provider "azapi" {
+  subscription_id = var.subscription_id
+}
+
 provider "databricks" {
   # Resolves the workspace host automatically and authenticates with Azure CLI.
   # auth_type pins Azure CLI auth so a stale ~/.databrickscfg profile or
   # DATABRICKS_* env var can't be picked up instead.
-  azure_workspace_resource_id = azurerm_databricks_workspace.this.id
+  azure_workspace_resource_id = azapi_resource.workspace.id
   auth_type                   = "azure-cli"
 }
