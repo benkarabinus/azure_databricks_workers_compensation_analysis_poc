@@ -1,0 +1,152 @@
+{
+  "datasets": [
+    {
+      "name": "rtw_summary",
+      "displayName": "RTW outcomes summary",
+      "queryLines": [
+        "SELECT injury_type, region, claim_count, avg_days_to_rtw, pct_surgery, avg_treatment_count\n",
+        "FROM state_fund_poc.gold.rtw_outcomes_summary"
+      ]
+    },
+    {
+      "name": "fraud_features",
+      "displayName": "Fraud features",
+      "queryLines": [
+        "SELECT claim_id, claim_amount, billing_total, billing_vs_claim_ratio, distinct_providers,\n",
+        "       provider_claim_count_30d, note_fraud_signal, attorney_flag, is_fraud\n",
+        "FROM state_fund_poc.gold.fraud_features"
+      ]
+    },
+    {
+      "name": "fraud_rate",
+      "displayName": "Fraud label rate",
+      "queryLines": [
+        "SELECT count(*) AS labeled_claims, round(100.0 * avg(is_fraud), 1) AS fraud_rate_pct\n",
+        "FROM state_fund_poc.gold.fraud_features"
+      ]
+    }
+  ],
+  "pages": [
+    {
+      "name": "overview",
+      "displayName": "RTW & Fraud Overview",
+      "layout": [
+        {
+          "widget": {
+            "name": "title",
+            "textbox_spec": "# State Fund — RTW & Fraud Triage\nReturn-to-work outcomes and fraud-investigation signals (synthetic POC data)."
+          },
+          "position": { "x": 0, "y": 0, "width": 6, "height": 2 }
+        },
+        {
+          "widget": {
+            "name": "counter_labeled",
+            "queries": [
+              {
+                "name": "main",
+                "query": {
+                  "datasetName": "fraud_rate",
+                  "fields": [{ "name": "labeled_claims", "expression": "`labeled_claims`" }],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": { "value": { "fieldName": "labeled_claims", "displayName": "Labeled claims" } }
+            }
+          },
+          "position": { "x": 0, "y": 2, "width": 3, "height": 4 }
+        },
+        {
+          "widget": {
+            "name": "counter_fraud_rate",
+            "queries": [
+              {
+                "name": "main",
+                "query": {
+                  "datasetName": "fraud_rate",
+                  "fields": [{ "name": "fraud_rate_pct", "expression": "`fraud_rate_pct`" }],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 2,
+              "widgetType": "counter",
+              "encodings": { "value": { "fieldName": "fraud_rate_pct", "displayName": "Fraud rate (%)" } }
+            }
+          },
+          "position": { "x": 3, "y": 2, "width": 3, "height": 4 }
+        },
+        {
+          "widget": {
+            "name": "bar_rtw_by_injury",
+            "queries": [
+              {
+                "name": "main",
+                "query": {
+                  "datasetName": "rtw_summary",
+                  "fields": [
+                    { "name": "injury_type", "expression": "`injury_type`" },
+                    { "name": "avg_rtw", "expression": "AVG(`avg_days_to_rtw`)" }
+                  ],
+                  "disaggregated": false
+                }
+              }
+            ],
+            "spec": {
+              "version": 3,
+              "widgetType": "bar",
+              "encodings": {
+                "x": { "fieldName": "injury_type", "scale": { "type": "categorical" }, "displayName": "Injury type" },
+                "y": { "fieldName": "avg_rtw", "scale": { "type": "quantitative" }, "displayName": "Avg days to RTW" }
+              }
+            }
+          },
+          "position": { "x": 0, "y": 6, "width": 6, "height": 7 }
+        },
+        {
+          "widget": {
+            "name": "table_fraud_signals",
+            "queries": [
+              {
+                "name": "main",
+                "query": {
+                  "datasetName": "fraud_features",
+                  "fields": [
+                    { "name": "claim_id", "expression": "`claim_id`" },
+                    { "name": "billing_vs_claim_ratio", "expression": "`billing_vs_claim_ratio`" },
+                    { "name": "distinct_providers", "expression": "`distinct_providers`" },
+                    { "name": "provider_claim_count_30d", "expression": "`provider_claim_count_30d`" },
+                    { "name": "note_fraud_signal", "expression": "`note_fraud_signal`" },
+                    { "name": "attorney_flag", "expression": "`attorney_flag`" },
+                    { "name": "is_fraud", "expression": "`is_fraud`" }
+                  ],
+                  "disaggregated": true
+                }
+              }
+            ],
+            "spec": {
+              "version": 1,
+              "widgetType": "table",
+              "encodings": {
+                "columns": [
+                  { "fieldName": "claim_id", "displayName": "Claim" },
+                  { "fieldName": "billing_vs_claim_ratio", "displayName": "Billing / claim" },
+                  { "fieldName": "distinct_providers", "displayName": "Distinct providers" },
+                  { "fieldName": "provider_claim_count_30d", "displayName": "Provider 30d claims" },
+                  { "fieldName": "note_fraud_signal", "displayName": "Note signal" },
+                  { "fieldName": "attorney_flag", "displayName": "Attorney" },
+                  { "fieldName": "is_fraud", "displayName": "Is fraud" }
+                ]
+              }
+            }
+          },
+          "position": { "x": 0, "y": 13, "width": 6, "height": 8 }
+        }
+      ]
+    }
+  ]
+}

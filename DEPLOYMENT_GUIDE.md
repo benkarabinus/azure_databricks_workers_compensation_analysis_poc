@@ -83,17 +83,39 @@ Full step‑by‑step instructions and doc links are in [session-1-bronze/README
 
 **Goal:** Clean, conform, dedupe, enforce DLT Expectations, mask PII (SSN/DOB), redact notes, and structure adjuster notes with `ai_extract` / `ai_classify`.
 
-**Output:** Governed `silver.*` tables and a live PII masking demo.
+**Output:** Governed `silver.*` tables (`claims`, `employees`, `treatments`, `provider_billing`, `rtw_timeline`, `adjuster_notes`) and a live PII masking + row-filter demo.
 
-_Detailed steps: coming soon (see `session-2-silver/`)._
+This session is a **UI walkthrough**; you run two interactive SQL notebooks and one Lakeflow SQL pipeline (two source files).
+
+**Steps:**
+
+1. **Create the masking functions & row filter:** import [session-2-silver/security_masking_functions.sql](session-2-silver/security_masking_functions.sql) as a **SQL notebook**, attach Serverless, and **Run all** — creates `security.mask_ssn`, `security.mask_dob`, and `security.claims_region_filter`. These must exist before the pipeline (MV masks/filters can only be declared in the `CREATE` statement). ([Row filters and column masks](https://learn.microsoft.com/azure/databricks/data-governance/unity-catalog/filters-and-masks/) · [CREATE FUNCTION](https://learn.microsoft.com/azure/databricks/sql/language-manual/sql-ref-syntax-ddl-create-sql-function))
+2. **Create account groups:** in the [account console](https://accounts.azuredatabricks.net), create `analysts` and `pii_authorized`, and add the **Silver pipeline owner** to `pii_authorized` (so the row filter doesn't drop rows from downstream/Gold tables). ([Manage groups](https://learn.microsoft.com/azure/databricks/admin/users-groups/groups))
+3. **Import** [silver_pipeline.sql](session-2-silver/silver_pipeline.sql) and [silver_adjuster_notes_ai.sql](session-2-silver/silver_adjuster_notes_ai.sql) (both import as workspace SQL files). ([Manage notebooks](https://learn.microsoft.com/azure/databricks/notebooks/notebooks-manage))
+4. **Run the Silver pipeline:** create a **Serverless ETL pipeline** with **both** SQL files as source code, default catalog `state_fund_poc` and schema `silver`; confirm the owner is in `pii_authorized`, then **Start**. Each table is a materialized view (dedupe via `QUALIFY`), with DLT Expectations and inline masks/row filter on `claims`. ([Develop SDP with SQL](https://learn.microsoft.com/azure/databricks/ldp/developer/sql-dev) · [Expectations](https://learn.microsoft.com/azure/databricks/ldp/expectations) · [AI Functions](https://learn.microsoft.com/azure/databricks/large-language-models/ai-functions)) — note `ai_query` needs a serving endpoint (`databricks-meta-llama-3-3-70b-instruct` or your own).
+5. **Grant & validate:** import [grants_and_validation.sql](session-2-silver/grants_and_validation.sql) as a **SQL notebook** and **Run all** — grants analyst/`pii_authorized` read access and validates masked-vs-unmasked output and that the poison/duplicate rows were handled. ([GRANT](https://learn.microsoft.com/azure/databricks/sql/language-manual/security-grant))
+6. **Verify** the six `silver.*` tables and the Expectation pass rates in the pipeline graph.
+
+Full step‑by‑step instructions and doc links are in [session-2-silver/README.md](session-2-silver/README.md).
 
 ### Session 3 — Gold, Lineage & Self-Service BI
 
 **Goal:** Engineer `gold.rtw_features` and `gold.fraud_features`, build BI aggregates, walk the lineage graph, configure a Genie Space, and build an AI/BI dashboard.
 
-**Output:** ML-ready Gold tables plus self-service BI.
+**Output:** ML-ready Gold tables (`rtw_features`, `fraud_features`, `rtw_outcomes_summary`), a `gold.data_quality` view, a Genie Space, and an AI/BI dashboard.
 
-_Detailed steps: coming soon (see `session-3-gold/`)._
+This session is a **UI walkthrough**: one Lakeflow SQL pipeline, one interactive SQL notebook, and two UI artifacts.
+
+**Steps:**
+
+1. **Run the Gold pipeline:** import [session-3-gold/gold_pipeline.sql](session-3-gold/gold_pipeline.sql) (workspace SQL file), create a **Serverless ETL pipeline** with it as source code, default catalog `state_fund_poc` and schema `gold`; confirm the owner is in `pii_authorized` (the `silver.claims` row filter evaluates as the invoker), then **Start**. Materialized views: `rtw_features` (closed claims + `days_to_rtw`), `fraud_features` (labeled SIU subset + `is_fraud`), `rtw_outcomes_summary` (aggregate). ([Develop SDP with SQL](https://learn.microsoft.com/azure/databricks/ldp/developer/sql-dev) · [Window functions](https://learn.microsoft.com/azure/databricks/sql/language-manual/sql-ref-window-functions))
+2. **Create the data-quality view:** import [data_quality_view.sql](session-3-gold/data_quality_view.sql) as a **SQL notebook** and **Run all** — creates `gold.data_quality` from the Silver pipeline's event log (Expectation pass rates). Run as the Silver pipeline owner. ([Pipeline event log](https://learn.microsoft.com/azure/databricks/ldp/monitor-event-logs))
+3. **Walk the lineage:** in **Catalog ▸ `gold` ▸ `rtw_features` ▸ Lineage**, trace each Gold table back through Silver to Bronze and the source files. ([Data lineage](https://learn.microsoft.com/azure/databricks/data-governance/unity-catalog/data-lineage))
+4. **Configure the Genie Space:** follow [genie_space.md](session-3-gold/genie_space.md) — add the three Gold tables, paste the instructions, seed the sample questions. ([AI/BI Genie](https://learn.microsoft.com/azure/databricks/genie/))
+5. **Import the dashboard:** **Dashboards ▸ ▾ ▸ Import dashboard from file** ▸ [dashboard/rtw_fraud.lvdash.json](session-3-gold/dashboard/rtw_fraud.lvdash.json) (a starter — verify visuals and refine). ([Import a dashboard](https://learn.microsoft.com/azure/databricks/dashboards/automate/import-export))
+6. **Verify** the three Gold tables, the `gold.data_quality` view, the Genie answers, and the dashboard.
+
+Full step‑by‑step instructions and doc links are in [session-3-gold/README.md](session-3-gold/README.md).
 
 ### Session 4 — Machine Learning with AutoML + MLflow
 

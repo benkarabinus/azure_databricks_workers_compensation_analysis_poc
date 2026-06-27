@@ -2,6 +2,7 @@
 title: Session 3 — Gold
 layout: default
 nav_order: 6
+has_children: true
 ---
 
 # Session 3 — Gold: Features, Lineage & Self-Service BI
@@ -73,8 +74,10 @@ Docs: [Data lineage with Unity Catalog](https://learn.microsoft.com/azure/databr
 
 ### 4. Configure the Genie Space
 
-Follow `genie_space.md`: create the space, add the three Gold tables, paste the instructions, seed
-sample questions, and test "which injury types have the longest average RTW by region?".
+Follow the **[Genie Space setup](session-3-genie.md)** page (mirrors
+`session-3-gold/genie_space.md`): create the space, add the three Gold tables, paste the
+instructions, seed sample questions, and test "which injury types have the longest average RTW by
+region?".
 
 Docs: [AI/BI Genie](https://learn.microsoft.com/azure/databricks/genie/) ·
 [Set up a Genie space](https://learn.microsoft.com/azure/databricks/genie/set-up)

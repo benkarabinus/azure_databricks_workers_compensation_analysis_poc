@@ -67,6 +67,7 @@ docs/                                  ← Jekyll GitHub Pages tutorial site (ju
   Gemfile                              ← Jekyll + theme dependencies
   index.md                             ← Tutorial home page
   session-0.md … session-5.md          ← One published page per session
+  session-3-genie.md                   ← Child page (Genie Space setup) mirroring session-3-gold/genie_space.md
   diagrams/                            ← draw.io sources (.drawio) + exported .svg/.png architecture diagrams
   images/                              ← Screenshots referenced by the session pages
 .github/                               ← Copilot customization
@@ -162,5 +163,5 @@ Single catalog **`state_fund_poc`** with these schemas:
 - Keep `session-N/` folders **self-contained and ordered**; later sessions build on earlier catalogs/tables.
 - **Cite verified docs for every step.** Every step in a session's instructions (`session-N/README.md`, `docs/session-N.md`, and `DEPLOYMENT_GUIDE.md`) must link to the **official Microsoft Learn / Databricks documentation** that documents how to complete that step. Use real, verified documentation pages — never invent or guess URLs — so each instruction is backed by an authoritative source.
 - **Architecture diagrams.** Author diagrams as `.drawio` sources under `docs/diagrams/` (with exported `.svg`/`.png`) using official Azure/Databricks icons, and reference the exported image — not the `.drawio` — in Markdown. Follow [.github/instructions/diagrams.instructions.md](instructions/diagrams.instructions.md).
-- **Keep docs in sync.** Every session change must be reflected in that session's `session-N/README.md`, the published `docs/session-N.md` page, and the `DEPLOYMENT_GUIDE.md` walkthrough.
+- **Keep docs in sync.** Every session change must be reflected in that session's `session-N/README.md`, the published `docs/session-N.md` page, and the `DEPLOYMENT_GUIDE.md` walkthrough. Any standalone session asset that should be browsable on the site (e.g. `session-3-gold/genie_space.md`) gets a mirrored `docs/` child page (`docs/session-3-genie.md`, `parent:` the session page) kept in sync.
 - **Verify volatile docs links.** Databricks restructures URLs (e.g., the Lakeflow rebrand); if a link 404s, search the feature name at [docs.databricks.com](https://docs.databricks.com).
