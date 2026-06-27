@@ -28,6 +28,7 @@ These rules apply to all SQL in the State Fund Lane 1 POC (serverless Azure Data
 - Keep Bronze raw: read CSV with `inferColumnTypes => false` (all strings, as-landed) and preserve nested JSON structure; add `_source_file` (`_metadata.file_path`) and `_ingested_at` (`current_timestamp()`).
 - Use **unqualified** table names so writes resolve to the pipeline's target catalog/schema; parameterize paths via the pipeline **Configuration** field (key-value) referenced with `${key}` in SQL — Serverless pipelines do **not** support a `SET` statement in source — never hard-coded environment paths.
 - Enforce data quality at the Bronze→Silver boundary with `CONSTRAINT … EXPECT (…) ON VIOLATION {DROP ROW|FAIL UPDATE}`.
+- Apply UC column masks and row filters to materialized views **inline** in the `CREATE` statement (they cannot be added later via `ALTER`), and reference the UDFs with the **fully-qualified** `catalog.schema.function` name (e.g. `state_fund_poc.security.mask_ssn`) — the pipeline's default catalog/schema is **not** applied to `MASK` / `ROW FILTER` function references.
 
 ## Governance & security
 
