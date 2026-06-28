@@ -2,21 +2,22 @@
 
 **Goal:** Create the `state_fund_poc` catalog and its six schemas, then land all six synthetic
 sources **append‑only** into `bronze.raw_*` — exactly as they arrive, adding only `_source_file`
-and `_ingested_at`.
+and `_ingested_at` columns to the sources.
 
 **Output:** Six Bronze tables — `raw_claims`, `raw_hr_records`, `raw_siu_labels`,
 `raw_medical_treatments`, `raw_provider_billing` (Auto Loader) and `raw_adjuster_notes` (Excel) —
 with the dirty patterns preserved for Silver to clean in Session 2.
 
 This session is a **UI walkthrough**: you import the source files in this folder, then do each step
-in the Databricks workspace. Every step links to the official Microsoft Learn documentation.
+in the Azure Databricks workspace UI. Every step links to the official Microsoft Learn documentation
+so users can read in depth about the different Azure Databricks features implemented in this session.
 
 ## Files in this folder
 
 | File | What it is | How you use it |
 | --- | --- | --- |
-| [00_create_catalog_and_schemas.sql](00_create_catalog_and_schemas.sql) | SQL notebook — catalog + 6 schemas + raw‑landing external volume | Import as a notebook, then run |
-| [bronze_autoloader_pipeline.sql](bronze_autoloader_pipeline.sql) | Lakeflow SDP pipeline (SQL) — `STREAMING TABLE` + `read_files` for the 5 CSV/JSON sources | Import, then attach to a serverless pipeline |
+| [00_create_catalog_and_schemas.sql](00_create_catalog_and_schemas.sql) | SQL notebook that creates the `state_fund_poc` catalog + 6 schemas + raw‑landing external volume | Import as a notebook, then run |
+| [bronze_autoloader_pipeline.sql](bronze_autoloader_pipeline.sql) | Lakeflow SDP pipeline (SQL) — `STREAMING TABLE` + `read_files` for the 5 CSV/JSON sources | Import, attach to a serverless pipeline then run as a serverless pipeline |
 | [ingest_adjuster_notes_excel.py](ingest_adjuster_notes_excel.py) | Serverless notebook — `openpyxl` reads the `.xlsx` | Import, then run as a serverless job |
 
 ## Prerequisites
@@ -28,8 +29,8 @@ in the Databricks workspace. Every step links to the official Microsoft Learn do
   `CREATE CATALOG` on the metastore, `CREATE MANAGED STORAGE` on the `managed` external location, and
   `CREATE EXTERNAL VOLUME` on the `landing` external location — held by the account/metastore admin
   from Session 0. ([Admin privileges](https://learn.microsoft.com/azure/databricks/data-governance/unity-catalog/manage-privileges/admin-privileges))
-- **The synthetic data files** in [data/](../data/) (generated in Step 0 of the
-  [Deployment Guide](../DEPLOYMENT_GUIDE.md)).
+- **The synthetic data files** in [data/](../data/) (located in the **data** directory of the
+  downloaded git repository).
 
 ## The six sources
 
@@ -66,7 +67,7 @@ You can also confirm in **Catalog** that `state_fund_poc` shows the
 
 Docs: [Manage notebooks](https://learn.microsoft.com/azure/databricks/notebooks/notebooks-manage) ·
 [Create catalogs](https://learn.microsoft.com/azure/databricks/catalogs/create-catalog) ·
-[CREATE VOLUME](https://learn.microsoft.com/azure/databricks/sql/language-manual/sql-ref-syntax-ddl-create-volume)
+[Create and manage Unity Catalog volumes](https://learn.microsoft.com/azure/databricks/volumes/utility-commands)
 
 ### 2. Upload the six source files to the landing volume
 
@@ -97,8 +98,7 @@ Docs: [Manage notebooks — import](https://learn.microsoft.com/azure/databricks
 
 ### 4. Create and run the Bronze Auto Loader pipeline
 
-The SQL `read_files` function invokes Auto Loader to incrementally ingest the five CSV/JSON sources into streaming tables;
-**Lakeflow manages the schema location and checkpoint for you** — no manual setup.
+The SQL `read_files` function invokes Auto Loader to incrementally ingest the five CSV/JSON sources into streaming tables. Lakeflow manages the schema location and checkpoint for you — no manual setup.
 ([What is Auto Loader?](https://learn.microsoft.com/azure/databricks/ingestion/cloud-object-storage/auto-loader/))
 
 1. In the sidebar, click **Jobs & Pipelines ▸ Create ▸ ETL pipeline** (Lakeflow Declarative
