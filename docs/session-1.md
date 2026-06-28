@@ -7,23 +7,22 @@ nav_order: 4
 # Session 1 — Foundations & Bronze Ingestion
 
 **Goal:** Create the `state_fund_poc` catalog and its six schemas, then land all six synthetic
-sources **append‑only** into `bronze.raw_*` — exactly as they arrive, adding only `_source_file`
-and `_ingested_at`.
+sources **append‑only** into `bronze.raw_*` exactly as they arrive, adding only `_source_file`
+and `_ingested_at` columns to the sources.
 
 **Output:** Six Bronze tables — `raw_claims`, `raw_hr_records`, `raw_siu_labels`,
 `raw_medical_treatments`, `raw_provider_billing` (Auto Loader) and `raw_adjuster_notes` (Excel) —
 with the dirty patterns preserved for Silver to clean in Session 2.
 
-This session is a **UI walkthrough**. The source files live in `session-1-bronze/` in the repository:
-you import them, then do each step in the Databricks workspace. Every step links to the official
-Microsoft Learn documentation.
+This session is a **UI walkthrough**. The source files live in `session-1-bronze/` in the repository. You import them, then do each step in the Azure Databricks workspace UI. Every step links to the official
+Microsoft Learn documentation so users can read in depth about the different Azure Databricks features implemented in this session.
 
 ## Source files
 
 | File | What it is | How you use it |
 | --- | --- | --- |
-| `00_create_catalog_and_schemas.sql` | SQL notebook — catalog + 6 schemas + raw‑landing external volume | Import as a notebook, then run |
-| `bronze_autoloader_pipeline.sql` | Lakeflow SDP pipeline (SQL) — `STREAMING TABLE` + `read_files` for the 5 CSV/JSON sources | Import, then attach to a serverless pipeline |
+| `00_create_catalog_and_schemas.sql` | SQL notebook that creates the state_fund_poc catalog + 6 schemas + raw‑landing external volume | Import as a notebook, then run |
+| `bronze_autoloader_pipeline.sql` | Lakeflow SDP pipeline (SQL) — `STREAMING TABLE` + `read_files` for the 5 CSV/JSON sources | Import, attach to a serverless pipeline then run as a serverless pipeline|
 | `ingest_adjuster_notes_excel.py` | Serverless notebook — `openpyxl` reads the `.xlsx` | Import, then run as a serverless job |
 
 ## Prerequisites
@@ -34,7 +33,7 @@ Microsoft Learn documentation.
   `CREATE CATALOG`, `CREATE MANAGED STORAGE` on the `managed` external location, and
   `CREATE EXTERNAL VOLUME` on the `landing` external location — held by the account/metastore admin
   from Session 0. ([Admin privileges](https://learn.microsoft.com/azure/databricks/data-governance/unity-catalog/manage-privileges/admin-privileges))
-- **The synthetic data files** (generated in Step 0 of the Deployment Guide).
+- **The synthetic data files** (located in the **data** directory of the dowloaded git repository).
 
 ## The six sources
 
@@ -57,7 +56,7 @@ Microsoft Learn documentation.
    `00_create_catalog_and_schemas.sql`. It imports as a **SQL notebook** — one step per cell, with a
    markdown explanation above each.
    ([Import a notebook](https://learn.microsoft.com/azure/databricks/notebooks/notebooks-manage))
-2. **Attach** it to **Serverless** compute.
+2. Attach it to Serverless compute.
 3. In the two `CREATE` cells, replace the placeholders with your Session 0 outputs:
    - `<MANAGED_CATALOG_LOCATION>` → `managed_catalog_location`
      (`abfss://state-fund-poc-managed@<storage>.dfs.core.windows.net/state_fund_poc`).
@@ -69,7 +68,7 @@ Confirm in **Catalog** that `state_fund_poc` shows the six schemas and a **Volum
 
 Docs: [Manage notebooks](https://learn.microsoft.com/azure/databricks/notebooks/notebooks-manage) ·
 [Create catalogs](https://learn.microsoft.com/azure/databricks/catalogs/create-catalog) ·
-[CREATE VOLUME](https://learn.microsoft.com/azure/databricks/sql/language-manual/sql-ref-syntax-ddl-create-volume)
+[Create and manage Unity Catalog Volumes](https://learn.microsoft.com/en-us/azure/databricks/volumes/utility-commands)
 
 ### 2. Upload the six source files to the landing volume
 
@@ -79,7 +78,7 @@ Docs: [Manage notebooks](https://learn.microsoft.com/azure/databricks/notebooks/
 3. Open each folder, click **Upload to this volume**, and upload the matching file per the table
    above.
 
-> Each source goes in its **own folder** because Auto Loader watches one directory per table. The
+> Each source goes in its own folder because Auto Loader watches one directory per table. The
 > folder names must match the table above.
 
 Docs: [Work with files in Unity Catalog volumes — upload](https://learn.microsoft.com/azure/databricks/volumes/volume-files#use-catalog-explorer) ·
@@ -88,16 +87,14 @@ Docs: [Work with files in Unity Catalog volumes — upload](https://learn.micros
 ### 3. Import the pipeline source and Excel notebook
 
 1. Click **Workspace**, pick a folder, then **⋮ ▸ Import**.
-2. Import `bronze_autoloader_pipeline.sql` (it imports as a workspace **SQL file** — a plain Lakeflow
-   pipeline source, not a notebook) and `ingest_adjuster_notes_excel.py` (it imports as a
-   **notebook**).
+2. Import `bronze_autoloader_pipeline.sql` (it imports as a workspace SQL file for use in a Lakeflow
+   pipeline source, not a notebook) and `ingest_adjuster_notes_excel.py` (it imports as a notebook whic is fine since it will be run via a Databricks job).
 
 Docs: [Manage notebooks — import](https://learn.microsoft.com/azure/databricks/notebooks/notebooks-manage)
 
 ### 4. Create and run the Bronze Auto Loader pipeline
 
-The SQL `read_files` function invokes Auto Loader to incrementally ingest the five CSV/JSON sources into streaming tables;
-**Lakeflow manages the schema location and checkpoint for you**.
+The SQL `read_files` function invokes Auto Loader to incrementally ingest the five CSV/JSON sources into streaming tables. Lakeflow manages the schema location and checkpoint for you.
 ([What is Auto Loader?](https://learn.microsoft.com/azure/databricks/ingestion/cloud-object-storage/auto-loader/))
 
 1. Click **Jobs & Pipelines ▸ Create ▸ ETL pipeline**.
