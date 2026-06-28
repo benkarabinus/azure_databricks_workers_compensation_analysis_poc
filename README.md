@@ -1,11 +1,11 @@
-# State Fund Lane 1 POC — Azure Databricks Medallion Lakehouse
+# State Fund Azure Databricks Serverless POC: Example ETL and Serving Workflow
 
-An end-to-end, **hands-on tutorial** that builds a medallion (Bronze → Silver → Gold) lakehouse on **Azure Databricks Serverless** for the California State Fund, delivering two machine-learning use cases on synthetic workers'-compensation data:
+An end-to-end, **hands-on tutorial** that builds a lakehouse medallion architecture (Bronze → Silver → Gold) on **Azure Databricks Serverless**. This walkthrough is designed for the California State Compensation Insurance Fund and is intended to familiarize users with the Azure Databricks platform by delivering two machine-learning use cases on synthetic workers'-compensation data:
 
 - **Return-to-Work (RTW) duration prediction** — regression on `days_to_rtw` so case managers can intervene earlier.
 - **Claims fraud investigation triage** — classification producing a `fraud_risk_score` that ranks open claims for SIU review.
 
-> All data is **synthetic**. All compute is **serverless**. Fraud is framed as **investigation triage acceleration**, never automated fraud detection.
+> All data is **synthetic**. All compute is **serverless**. Fraud is framed as **investigation triage acceleration**, not fully automated fraud detection.
 
 ## About this tutorial
 
@@ -18,11 +18,11 @@ The build is split into ordered **sessions**, each a self-contained stage in its
 
 | Session | Focus | Key outputs |
 | --- | --- | --- |
-| **0 — Setup** | Workspace, Unity Catalog metastore, serverless enablement, dedicated ADLS Gen2 External Location, access | Working serverless workspace |
-| **1 — Bronze** | Catalog/schemas; Auto Loader DLT (CSV/JSON) + Excel ingest | `bronze.raw_*` tables |
+| **0 — Setup** | Terraform provisions a serverless workspace + dedicated ADLS Gen2 External Location (Unity Catalog auto-enabled) | Working serverless workspace |
+| **1 — Bronze** | Catalog/schemas, Auto Loader DLT (CSV/JSON) + Excel ingest | `bronze.raw_*` tables |
 | **2 — Silver** | Cleaning, DLT Expectations, PII masking, AI Functions on adjuster notes | governed `silver.*` |
 | **3 — Gold** | Feature tables, BI aggregates, lineage, Genie, AI/BI dashboard | ML-ready `gold.*` + self-service BI |
-| **4 — ML** | AutoML (RTW regression + fraud classification), MLflow, register to UC | `ml.rtw_model`, `ml.fraud_model` |
+| **4 — ML** | Serverless scikit-learn training (RTW + fraud), MLflow, register to Unity Catalog | `ml.rtw_model`, `ml.fraud_model` |
 | **5 — Serving** | Batch scoring, Streamlit triage app, Vector Search, Workflow, governance | live app + automated pipeline |
 
 ## Architecture

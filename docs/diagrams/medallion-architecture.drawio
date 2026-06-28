@@ -1,10 +1,10 @@
 <mxfile host="65bd71144e">
     <diagram id="medallion-architecture" name="Medallion Architecture">
-        <mxGraphModel dx="688" dy="491" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1180" pageHeight="500" background="#ffffff" math="0" shadow="0">
+        <mxGraphModel dx="530" dy="991" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1180" pageHeight="500" background="#ffffff" math="0" shadow="0">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
-                <mxCell id="title" value="California State Fund — Lane 1 POC" style="text;html=1;align=left;verticalAlign=middle;fontSize=20;fontStyle=1;fontColor=#202124;" parent="1" vertex="1">
+                <mxCell id="title" value="High-level POC Architecture" style="text;html=1;align=left;verticalAlign=middle;fontSize=20;fontStyle=1;fontColor=#202124;" parent="1" vertex="1">
                     <mxGeometry x="20" y="14" width="700" height="28" as="geometry"/>
                 </mxCell>
                 <mxCell id="subtitle" value="End-to-end medallion lakehouse on Azure Databricks Serverless — Sources → Bronze → Silver → Gold → ML / Serving / BI" style="text;html=1;align=left;verticalAlign=middle;fontSize=13;fontColor=#5F6368;" parent="1" vertex="1">
@@ -103,17 +103,17 @@
                 <mxCell id="ico_dbx" value="" style="shape=image;html=1;verticalAlign=top;aspect=fixed;imageAspect=0;image=img/lib/azure2/analytics/Azure_Databricks.svg;" parent="1" vertex="1">
                     <mxGeometry x="966" y="13" width="26" height="26" as="geometry"/>
                 </mxCell>
-                <mxCell id="3" value="" style="whiteSpace=wrap;html=1;aspect=fixed;strokeColor=none;" vertex="1" parent="1">
+                <mxCell id="3" value="" style="whiteSpace=wrap;html=1;aspect=fixed;strokeColor=none;" parent="1" vertex="1">
                     <mxGeometry x="3" y="203.5" width="27" height="27" as="geometry"/>
                 </mxCell>
-                <mxCell id="4" value="" style="whiteSpace=wrap;html=1;aspect=fixed;strokeColor=none;" vertex="1" parent="1">
+                <mxCell id="4" value="" style="whiteSpace=wrap;html=1;aspect=fixed;strokeColor=none;" parent="1" vertex="1">
                     <mxGeometry x="387" y="476" width="21" height="21" as="geometry"/>
                 </mxCell>
-                <mxCell id="5" value="" style="whiteSpace=wrap;html=1;aspect=fixed;strokeColor=none;" vertex="1" parent="1">
+                <mxCell id="5" value="" style="whiteSpace=wrap;html=1;aspect=fixed;strokeColor=none;" parent="1" vertex="1">
                     <mxGeometry x="1167" y="413" width="20" height="20" as="geometry"/>
                 </mxCell>
-                <mxCell id="6" value="" style="whiteSpace=wrap;html=1;aspect=fixed;strokeColor=none;" vertex="1" parent="1">
-                    <mxGeometry x="1040" width="10" height="10" as="geometry"/>
+                <mxCell id="6" value="" style="whiteSpace=wrap;html=1;aspect=fixed;strokeColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="1040" y="-10" width="20" height="20" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>

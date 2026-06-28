@@ -19,8 +19,8 @@ Everything in this session lives under [terraform/](terraform/) and is created w
 | Resource | Terraform | Purpose |
 | --- | --- | --- |
 | Resource group | `azurerm_resource_group` (create‑or‑reuse) | Container for all POC resources |
-| ADLS Gen2 account + 2 containers | `azurerm_storage_account` (`is_hns_enabled = true`), `azurerm_storage_container` ×2 | Dedicated `landing` (raw files) + `state-fund-poc-managed` (Bronze/Silver/Gold managed tables) storage, **separate** from the metastore root |
-| Databricks workspace | `azapi_resource` (`computeMode = "Serverless"`) | True serverless workspace — no managed RG/VNet/DBFS; Unity Catalog auto‑enabled |
+| ADLS Gen2 account + 2 containers | `azurerm_storage_account` (`is_hns_enabled = true`), `azurerm_storage_container` ×2 | Dedicated `landing` (raw files) + `state-fund-poc-managed` (Bronze/Silver/Gold managed tables) storage, **separate** from the regional metastore root |
+| Databricks workspace | `azapi_resource` (`computeMode = "Serverless"`) | Serverless only Azure Databricks workspace, Unity Catalog auto‑enabled |
 | Access connector | `azurerm_databricks_access_connector` (system‑assigned identity) | Managed identity Unity Catalog uses to reach storage |
 | Role assignments | `azurerm_role_assignment` ×4 | Grant the connector’s identity blob‑data + file‑event access, and the deployer blob‑data access to create the containers |
 | Storage credential | `databricks_storage_credential` | Unity Catalog wrapper around the managed identity |
@@ -72,7 +72,7 @@ Everything in this session lives under [terraform/](terraform/) and is created w
   scope (required to grant the managed identity its roles).
 - **Account‑level Unity Catalog privileges.** Creating the storage credential and external
   location requires the `CREATE STORAGE CREDENTIAL` / `CREATE EXTERNAL LOCATION` privileges, held
-  by an [account admin or metastore admin](https://learn.microsoft.com/azure/databricks/data-governance/unity-catalog/manage-privileges/admin-privileges).
+  by a Databricks [account admin or metastore admin](https://learn.microsoft.com/azure/databricks/data-governance/unity-catalog/manage-privileges/admin-privileges).
 - **[Terraform CLI](https://developer.hashicorp.com/terraform/install)** ≥ 1.6.
 - **[Azure CLI](https://learn.microsoft.com/cli/azure/install-azure-cli)** — used for authentication.
 
@@ -107,7 +107,7 @@ constraint is also documented inline in the file.
 
 | Variable | What to set | Constraint |
 | --- | --- | --- |
-| `subscription_id` | Your Azure subscription (or omit and export `ARM_SUBSCRIPTION_ID`) | GUID |
+| `subscription_id` | Your Azure subscription ID | GUID |
 | `storage_account_name` | A **globally unique** ADLS Gen2 account name | 3–24 lowercase letters/digits |
 | `workspace_name` | The Databricks workspace name | 3–64 chars; letters, digits, `-`, `_` |
 | `access_connector_name` | The access connector (managed identity) name | 3–64 chars; letters, digits, `-`, `_`, `.` |
@@ -217,7 +217,7 @@ Use `landing_path` as the value for the pipelines’ `landing_path` widget — i
 in [common/config.py](../common/config.py). In Session 1 you’ll use `managed_catalog_location` as the
 catalog’s `MANAGED LOCATION`. Re‑print the outputs any time with `terraform output`.
 
-### 6. Tear down (when finished)
+### 6. Tear down (when finished with POC)
 
 ```powershell
 terraform destroy
