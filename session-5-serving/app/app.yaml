@@ -1,0 +1,14 @@
+# Databricks App config for the fraud triage queue (Streamlit).
+# Docs: https://learn.microsoft.com/azure/databricks/dev-tools/databricks-apps/app-runtime
+#
+# Attach a SQL warehouse to this app as a resource with the key `sql-warehouse`
+# (App ▸ Edit ▸ Resources). That injects the warehouse id into DATABRICKS_WAREHOUSE_ID
+# below. Also grant the app's service principal SELECT on state_fund_poc.gold.fraud_scores.
+command:
+  - streamlit
+  - run
+  - app.py
+
+env:
+  - name: DATABRICKS_WAREHOUSE_ID
+    valueFrom: sql-warehouse

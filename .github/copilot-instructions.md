@@ -114,7 +114,7 @@ Single catalog **`state_fund_poc`** with these schemas:
 | --- | --- |
 | `bronze` | `raw_claims`, `raw_hr_records`, `raw_medical_treatments`, `raw_provider_billing`, `raw_adjuster_notes`, `raw_siu_labels` |
 | `silver` | `claims`, `employees`, `treatments`, `rtw_timeline`, `provider_billing`, `adjuster_notes` |
-| `gold` | `rtw_features`, `rtw_outcomes_summary`, `fraud_features`, `fraud_scores` |
+| `gold` | `rtw_features`, `rtw_outcomes_summary`, `fraud_features`, `fraud_scores`, `rtw_predictions`, `data_quality` (view), `claim_notes` (+ `claim_notes_index` Vector Search) |
 | `ml` | Registered models: `rtw_model`, `fraud_model` |
 | `config` | Pipeline/config tables and reference data |
 | `security` | Masking functions and row-filter functions |

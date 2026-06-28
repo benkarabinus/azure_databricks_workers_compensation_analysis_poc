@@ -141,6 +141,18 @@ Full step‑by‑step instructions and doc links are in [session-4-ml/README.md]
 
 **Goal:** Batch-score claims to `gold.fraud_scores` and RTW predictions, build the Streamlit Databricks App triage queue with Vector Search, orchestrate the pipeline end-to-end with Databricks Workflows, and verify governance (audit, row filters, time travel).
 
-**Output:** A live fraud triage app and an automated end-to-end pipeline.
+**Output:** `gold.fraud_scores` + `gold.rtw_predictions`, a Vector Search index, a live Streamlit App, an end-to-end Workflow, and governance demos.
 
-_Detailed steps: coming soon (see `session-5-serving/`)._
+> **POC scoring note:** we score the existing Gold feature tables (which the models also trained on) — a predicted-vs-actual demo. In production you'd score open/unlabeled claims by reusing the Gold feature SQL without the label join / closed filter.
+
+**Steps:**
+
+1. **Score fraud:** import [session-5-serving/batch_score_fraud.py](session-5-serving/batch_score_fraud.py), **Run all** on Serverless — loads `ml.fraud_model@champion`, writes the ranked **`gold.fraud_scores`** (`fraud_risk_score`, `risk_tier`, `top_contributing_factor`). ([Load UC models](https://learn.microsoft.com/azure/databricks/machine-learning/manage-model-lifecycle/))
+2. **Score RTW:** import [batch_score_rtw.py](session-5-serving/batch_score_rtw.py), **Run all** — writes `gold.rtw_predictions` (predicted vs actual `days_to_rtw`).
+3. **Vector Search:** import [vector_search_setup.py](session-5-serving/vector_search_setup.py), run cell by cell (the endpoint takes a few minutes to come ONLINE) — CDF source table from redacted notes → AI Search endpoint → delta-sync index → similarity query. ([Create AI Search indexes](https://learn.microsoft.com/azure/databricks/ai-search/create-ai-search))
+4. **Deploy the app:** **Compute ▸ Apps ▸ Create app** (Streamlit), add a **SQL warehouse** resource keyed `sql-warehouse`, upload [app/](session-5-serving/app/), **Deploy**, and grant the app's service principal `SELECT` on `gold.fraud_scores`. ([Databricks Apps](https://learn.microsoft.com/azure/databricks/dev-tools/databricks-apps/))
+5. **Orchestrate:** edit [workflow/end_to_end_job.json](session-5-serving/workflow/end_to_end_job.json) (replace the `<...>` pipeline IDs / notebook paths) and import it as a **Job** — ingest → Bronze → Silver → Gold → score → quality on Serverless. ([Lakeflow Jobs](https://learn.microsoft.com/azure/databricks/jobs/))
+6. **Governance:** run the three [governance/](session-5-serving/governance/) notebooks — `row_filter_demo.sql` (masks/row filter), `audit_system_tables.sql` (access + lineage; needs `system.access` enabled), `time_travel_recovery.sql` (Delta history + `RESTORE`). ([Row filters & masks](https://learn.microsoft.com/azure/databricks/data-governance/unity-catalog/filters-and-masks/) · [System tables](https://learn.microsoft.com/azure/databricks/admin/system-tables/) · [Delta history](https://learn.microsoft.com/azure/databricks/delta/history))
+7. **Verify** the triage app renders the ranked queue and the governance demos behave as expected.
+
+Full step‑by‑step instructions and doc links are in [session-5-serving/README.md](session-5-serving/README.md).
