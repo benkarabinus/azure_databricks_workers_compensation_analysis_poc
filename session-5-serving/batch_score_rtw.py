@@ -15,7 +15,7 @@
 # COMMAND ----------
 
 # DBTITLE 1,Install dependencies
-# MAGIC %pip install mlflow[databricks] -q
+# MAGIC %pip install mlflow[databricks] scikit-learn==1.7.2 -q
 # MAGIC %restart_python
 
 # COMMAND ----------

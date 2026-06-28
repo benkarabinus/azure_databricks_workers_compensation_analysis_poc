@@ -49,7 +49,7 @@ session-5-serving/                     ← Serving, triage app, orchestration & 
     app.py                             ← Streamlit entry point (reads gold.fraud_scores)
     app.yaml                           ← Databricks App config (command: streamlit run app.py)
     requirements.txt                   ← Pins streamlit + databricks-sdk
-  workflow/end_to_end_job.json         ← Workflow: ingest → DLT → score → quality
+  workflow/end_to_end_job.yaml         ← Workflow (YAML): ingest → DLT → score → quality
   governance/                          ← audit_system_tables.sql, row_filter_demo.sql, time_travel_recovery.sql
   README.md
 common/                                ← Shared helpers reused across sessions

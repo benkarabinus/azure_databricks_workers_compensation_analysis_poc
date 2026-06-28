@@ -18,14 +18,20 @@
 # COMMAND ----------
 
 # DBTITLE 1,Install dependencies
-# MAGIC %pip install mlflow[databricks] -q
+# MAGIC %pip install mlflow[databricks] scikit-learn==1.7.2 -q
 # MAGIC %restart_python
 
 # COMMAND ----------
 
+# DBTITLE 1,Load model & config
 import mlflow
 import mlflow.sklearn
 import numpy as np
+import yaml
+import os
+import skops.io as sio
+import sys
+import sklearn._loss._loss as _loss_cython_mod
 from pyspark.sql import functions as F
 
 mlflow.set_registry_uri("databricks-uc")
@@ -35,7 +41,15 @@ MODEL = f"models:/{CATALOG}.ml.fraud_model@champion"
 SOURCE_TABLE = f"{CATALOG}.gold.fraud_features"
 TARGET_TABLE = f"{CATALOG}.gold.fraud_scores"
 
-model = mlflow.sklearn.load_model(MODEL)
+# skops stores __module__='_loss' (Cython short name) but Python needs the full package path
+# to reconstruct the type — register it so importlib.import_module('_loss') resolves correctly
+sys.modules.setdefault('_loss', _loss_cython_mod)
+
+# Model serialized with skops — declare the internal sklearn type used by HistGradientBoosting
+_local_path = mlflow.artifacts.download_artifacts(MODEL)
+with open(os.path.join(_local_path, "MLmodel")) as _f:
+    _flavor = yaml.safe_load(_f)["flavors"]["sklearn"]
+model = sio.load(os.path.join(_local_path, _flavor["pickled_model"]), trusted=["_loss.CyHalfBinomialLoss", "numpy.dtype"])
 print("Loaded", MODEL)
 
 # COMMAND ----------

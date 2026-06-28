@@ -18,7 +18,7 @@ Workflow JSON, and interactive governance SQL.
 | [batch_score_rtw.py](batch_score_rtw.py) | Serverless notebook — score `@champion` RTW model → `gold.rtw_predictions` | Import, run on Serverless |
 | [vector_search_setup.py](vector_search_setup.py) | Serverless notebook — AI Search index over redacted notes | Import, run on Serverless |
 | [app/app.py](app/app.py) · [app/app.yaml](app/app.yaml) · [app/requirements.txt](app/requirements.txt) | Streamlit **Databricks App** (reads `gold.fraud_scores`) | Deploy as a Databricks App |
-| [workflow/end_to_end_job.json](workflow/end_to_end_job.json) | Reference Workflow: ingest → DLT → score → quality | Adapt placeholders, import as a Job |
+| [workflow/end_to_end_job.yaml](workflow/end_to_end_job.yaml) | Reference Workflow: ingest → DLT → score → quality | Adapt placeholders, import via Job ▸ Edit as YAML |
 | [governance/](governance/) | `audit_system_tables.sql`, `row_filter_demo.sql`, `time_travel_recovery.sql` | Import as notebooks, run |
 
 ## Prerequisites
@@ -76,10 +76,10 @@ Docs: [Databricks Apps](https://learn.microsoft.com/azure/databricks/dev-tools/d
 
 ### 5. Orchestrate end-to-end
 
-Open [workflow/end_to_end_job.json](workflow/end_to_end_job.json), replace the `<...>` placeholders
-(pipeline IDs + notebook paths), and import it (**Jobs & Pipelines ▸ Create ▸ Job**, or the Jobs
-API). It chains **ingest → Bronze → Silver → Gold → score (fraud + RTW) → data quality** on
-Serverless.
+Open [workflow/end_to_end_job.yaml](workflow/end_to_end_job.yaml), replace the `<...>` placeholders
+(pipeline IDs + notebook paths). Create a job, then use the kebab (**...**) menu ▸ **Edit as YAML**
+and paste it in (the Jobs UI imports YAML, not JSON). It chains
+**ingest → Bronze → Silver → Gold → score (fraud + RTW) → data quality** on Serverless.
 
 Docs: [Lakeflow Jobs](https://learn.microsoft.com/azure/databricks/jobs/) ·
 [Pipeline task](https://learn.microsoft.com/azure/databricks/jobs/pipeline-task)

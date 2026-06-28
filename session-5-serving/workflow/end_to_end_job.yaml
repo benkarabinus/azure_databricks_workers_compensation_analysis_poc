@@ -1,0 +1,63 @@
+# Reference Workflow: ingest -> Bronze -> Silver -> Gold -> score -> quality.
+#
+# How to use: in the Jobs UI, create a job, open the kebab (...) menu and choose
+# "Edit as YAML", then paste this. Replace the <...> placeholders (your workspace
+# folder holding the imported notebooks, and the three pipeline IDs) with your
+# values. All tasks run on Serverless.
+#
+# Docs: https://learn.microsoft.com/azure/databricks/jobs/
+resources:
+  jobs:
+    state_fund_poc_end_to_end:
+      name: state_fund_poc_end_to_end
+      description: "Reference Workflow: ingest -> Bronze -> Silver -> Gold -> score ->
+        quality."
+      tasks:
+        - task_key: ingest_excel
+          notebook_task:
+            notebook_path: /Workspace/<your-folder>/ingest_adjuster_notes_excel
+            source: WORKSPACE
+          environment_key: serverless
+        - task_key: bronze_pipeline
+          pipeline_task:
+            pipeline_id: <BRONZE_PIPELINE_ID>
+        - task_key: silver_pipeline
+          depends_on:
+            - task_key: bronze_pipeline
+            - task_key: ingest_excel
+          pipeline_task:
+            pipeline_id: <SILVER_PIPELINE_ID>
+        - task_key: gold_pipeline
+          depends_on:
+            - task_key: silver_pipeline
+          pipeline_task:
+            pipeline_id: <GOLD_PIPELINE_ID>
+        - task_key: score_fraud
+          depends_on:
+            - task_key: gold_pipeline
+          notebook_task:
+            notebook_path: /Workspace/<your-folder>/batch_score_fraud
+            source: WORKSPACE
+          environment_key: serverless
+        - task_key: score_rtw
+          depends_on:
+            - task_key: gold_pipeline
+          notebook_task:
+            notebook_path: /Workspace/<your-folder>/batch_score_rtw
+            source: WORKSPACE
+          environment_key: serverless
+        - task_key: data_quality
+          depends_on:
+            - task_key: score_fraud
+            - task_key: score_rtw
+          notebook_task:
+            notebook_path: /Workspace/<your-folder>/data_quality_view
+            source: WORKSPACE
+          environment_key: serverless
+      queue:
+        enabled: true
+      environments:
+        - environment_key: serverless
+          spec:
+            client: "2"
+      performance_target: PERFORMANCE_OPTIMIZED

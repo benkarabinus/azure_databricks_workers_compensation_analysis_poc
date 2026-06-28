@@ -23,7 +23,7 @@ App, a Workflow JSON, and interactive governance SQL.
 | `batch_score_rtw.py` | Score `@champion` RTW model → `gold.rtw_predictions` |
 | `vector_search_setup.py` | AI Search index over redacted notes (similar-claim lookup) |
 | `app/` | Streamlit Databricks App (reads `gold.fraud_scores`) |
-| `workflow/end_to_end_job.json` | Reference Workflow: ingest → DLT → score → quality |
+| `workflow/end_to_end_job.yaml` | Reference Workflow: ingest → DLT → score → quality |
 | `governance/` | `audit_system_tables.sql`, `row_filter_demo.sql`, `time_travel_recovery.sql` |
 
 ## Prerequisites
@@ -70,8 +70,9 @@ Docs: [Databricks Apps](https://learn.microsoft.com/azure/databricks/dev-tools/d
 
 ### 5. Orchestrate end-to-end
 
-Edit `workflow/end_to_end_job.json` (replace the `<...>` pipeline IDs / notebook paths) and import it
-as a Job — chains **ingest → Bronze → Silver → Gold → score → quality** on Serverless.
+Edit `workflow/end_to_end_job.yaml` (replace the `<...>` pipeline IDs / notebook paths), then create
+a job and paste it via the kebab (**...**) ▸ **Edit as YAML** (the Jobs UI imports YAML, not JSON) —
+chains **ingest → Bronze → Silver → Gold → score → quality** on Serverless.
 
 Docs: [Lakeflow Jobs](https://learn.microsoft.com/azure/databricks/jobs/)
 
