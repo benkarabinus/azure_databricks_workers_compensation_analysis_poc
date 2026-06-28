@@ -7,8 +7,10 @@ Vector Search, orchestrate the whole medallion end-to-end, and verify governance
 index, a live Streamlit **Databricks App**, an end-to-end **Workflow**, and governance demos
 (audit, row filter, time travel).
 
+![Fraud triage serving flow — features + @champion model → batch score → gold.fraud_scores → Databricks App, with Vector Search similar-claim lookup](../docs/diagrams/fraud-triage-flow.svg)
+
 This session is a **mixed walkthrough**: notebooks (scoring, Vector Search), a deployed App, a
-Workflow JSON, and interactive governance SQL.
+Workflow YAML, and interactive governance SQL.
 
 ## Files in this folder
 

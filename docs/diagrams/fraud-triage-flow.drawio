@@ -1,0 +1,79 @@
+<mxfile host="65bd71144e">
+    <diagram id="fraud-triage-flow" name="Fraud Triage Flow">
+        <mxGraphModel dx="530" dy="491" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1040" pageHeight="420" background="#ffffff" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="title" value="Use Case 2 — Fraud Investigation Triage (serving)" style="text;html=1;align=left;verticalAlign=middle;fontSize=18;fontStyle=1;fontColor=#202124;" parent="1" vertex="1">
+                    <mxGeometry x="20" y="14" width="700" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="subtitle" value="Model ranks claims for SIU review — triage acceleration, not automated fraud detection. All compute Serverless." style="text;html=1;align=left;verticalAlign=middle;fontSize=12;fontColor=#5F6368;" parent="1" vertex="1">
+                    <mxGeometry x="20" y="40" width="820" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="features" value="gold.fraud_features" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FBF1CC;strokeColor=#C9A227;" parent="1" vertex="1">
+                    <mxGeometry x="30" y="88" width="180" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="model" value="ml.fraud_model @champion" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDE7F6;strokeColor=#7E57C2;" parent="1" vertex="1">
+                    <mxGeometry x="30" y="150" width="180" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="score" value="batch_score_fraud&#xa;(Serverless job)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0F2F1;strokeColor=#00897B;" parent="1" vertex="1">
+                    <mxGeometry x="260" y="119" width="180" height="56" as="geometry"/>
+                </mxCell>
+                <mxCell id="scores" value="gold.fraud_scores&#xa;(ranked triage queue)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FBF1CC;strokeColor=#C9A227;" parent="1" vertex="1">
+                    <mxGeometry x="490" y="119" width="180" height="56" as="geometry"/>
+                </mxCell>
+                <mxCell id="app" value="Databricks App — Streamlit&#xa;&#xa;• Ranked triage queue (risk tier filter)&#xa;• Per-claim detail + top contributing factor&#xa;• Similar past claims (Vector Search)&#xa;Reads gold.fraud_scores only · service principal" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=12;spacingTop=8;fillColor=#EDE7F6;strokeColor=#7E57C2;fontColor=#202124;" parent="1" vertex="1">
+                    <mxGeometry x="720" y="88" width="290" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="notes" value="silver.adjuster_notes&#xa;(PII redacted)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ECEFF1;strokeColor=#90A4AE;" parent="1" vertex="1">
+                    <mxGeometry x="30" y="300" width="180" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="cdf" value="gold.claim_notes&#xa;(Change Data Feed)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FBF1CC;strokeColor=#C9A227;" parent="1" vertex="1">
+                    <mxGeometry x="260" y="300" width="180" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="vs" value="AI Search index&#xa;claim_notes_index · gte-large-en" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E0F2F1;strokeColor=#00897B;" parent="1" vertex="1">
+                    <mxGeometry x="490" y="300" width="180" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="foot" value="Vector Search embeds only redacted note text (no PII). Models referenced via the @champion alias, decoupled from version numbers." style="text;html=1;align=left;fontSize=11;fontColor=#5F6368;" parent="1" vertex="1">
+                    <mxGeometry x="20" y="380" width="1000" height="18" as="geometry"/>
+                </mxCell>
+                <mxCell id="ea" style="endArrow=block;html=1;strokeColor=#455A64;strokeWidth=2;" parent="1" source="features" target="score" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="eb" style="endArrow=block;html=1;strokeColor=#455A64;strokeWidth=2;" parent="1" source="model" target="score" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="ec" style="endArrow=block;html=1;strokeColor=#455A64;strokeWidth=2;" parent="1" source="score" target="scores" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="ed" style="endArrow=block;html=1;strokeColor=#455A64;strokeWidth=2;" parent="1" source="scores" target="app" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="en1" style="endArrow=block;html=1;strokeColor=#455A64;strokeWidth=2;" parent="1" source="notes" target="cdf" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="en2" style="endArrow=block;html=1;strokeColor=#455A64;strokeWidth=2;" parent="1" source="cdf" target="vs" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="en3" style="endArrow=block;html=1;dashed=1;strokeColor=#455A64;strokeWidth=2;" parent="1" source="vs" target="app" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="ico_dbx" value="" style="shape=image;html=1;verticalAlign=top;aspect=fixed;imageAspect=0;image=img/lib/azure2/analytics/Azure_Databricks.svg;" parent="1" vertex="1">
+                    <mxGeometry x="961" y="12" width="26" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="2" value="" style="whiteSpace=wrap;html=1;aspect=fixed;strokeColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="1016" y="136" width="22" height="22" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="" style="whiteSpace=wrap;html=1;aspect=fixed;strokeColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="771" width="22" height="22" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="" style="whiteSpace=wrap;html=1;aspect=fixed;strokeColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="2" y="152" width="22" height="22" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="" style="whiteSpace=wrap;html=1;aspect=fixed;strokeColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="253" y="402" width="14" height="14" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

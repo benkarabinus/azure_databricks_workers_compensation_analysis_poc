@@ -13,6 +13,8 @@ Azure Databricks workspace plus a **dedicated ADLS Gen2 account** registered as 
 **Output:** A running serverless workspace (Unity Catalog auto‑enabled) and a
 validated external location pointing at `abfss://landing@<storage>.dfs.core.windows.net/`.
 
+![Session 0 Terraform infrastructure — serverless workspace, ADLS Gen2 (landing + managed), access connector, Unity Catalog external locations](diagrams/session-0-infrastructure.svg)
+
 All assets live under `session-0-setup/terraform/` in the repository and are created with
 `terraform apply`. Optionally tear everything down with `terraform destroy` when finished.
 

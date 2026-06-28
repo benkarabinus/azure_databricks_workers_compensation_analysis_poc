@@ -29,6 +29,8 @@ The build is split into ordered **sessions**, each a self-contained stage in its
 
 The POC is an end-to-end medallion lakehouse. Synthetic source files land in a dedicated ADLS Gen2 account (registered as a Unity Catalog **External Location**), and flow Bronze → Silver → Gold, then into ML, serving, and governance — all on serverless compute.
 
+![Medallion architecture — Sources → Bronze → Silver → Gold → ML / Serving / BI, governed by Unity Catalog](docs/diagrams/medallion-architecture.svg)
+
 A single Unity Catalog catalog, **`state_fund_poc`**, holds six schemas:
 
 | Schema | Contents |

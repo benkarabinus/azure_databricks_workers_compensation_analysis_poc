@@ -12,8 +12,10 @@ Vector Search, orchestrate the whole medallion end-to-end, and verify governance
 **Output:** `gold.fraud_scores` (ranked triage queue) + `gold.rtw_predictions`, a Vector Search
 index, a live Streamlit **Databricks App**, an end-to-end **Workflow**, and governance demos.
 
+![Fraud triage serving flow — features + @champion model → batch score → gold.fraud_scores → Databricks App, with Vector Search similar-claim lookup](diagrams/fraud-triage-flow.svg)
+
 All assets live under `session-5-serving/`: scoring notebooks, a Vector Search notebook, a deployed
-App, a Workflow JSON, and interactive governance SQL.
+App, a Workflow YAML, and interactive governance SQL.
 
 ## Source files
 

@@ -13,6 +13,8 @@ A hands-on tutorial that builds an end-to-end **medallion (Bronze → Silver →
 
 > All data is **synthetic**. All compute is **serverless**. Fraud is framed as **investigation triage acceleration**, never automated fraud detection.
 
+![Medallion architecture — Sources → Bronze → Silver → Gold → ML / Serving / BI, governed by Unity Catalog](diagrams/medallion-architecture.svg)
+
 ## How this tutorial works
 
 The build is split into ordered **sessions**, each a self-contained stage. Work them in order — each depends on the catalog, schemas, and tables created earlier.
@@ -23,10 +25,10 @@ The build is split into ordered **sessions**, each a self-contained stage. Work 
 | **1 — Bronze** | Catalog/schemas; Auto Loader DLT (CSV/JSON) + Excel ingest | `bronze.raw_*` tables |
 | **2 — Silver** | Cleaning, DLT Expectations, PII masking, AI Functions on notes | governed `silver.*` |
 | **3 — Gold** | Feature tables, BI aggregates, lineage, Genie, AI/BI dashboard | ML-ready `gold.*` + BI |
-| **4 — ML** | AutoML (RTW + fraud), MLflow, register to Unity Catalog | `ml.rtw_model`, `ml.fraud_model` |
+| **4 — ML** | Serverless scikit-learn training (RTW + fraud), MLflow, register to Unity Catalog | `ml.rtw_model`, `ml.fraud_model` |
 | **5 — Serving** | Batch scoring, Streamlit triage app, Vector Search, Workflow, governance | live app + automated pipeline |
 
-Session pages are published here as each session is built. Until then, the full walkthrough lives in `DEPLOYMENT_GUIDE.md` in the repository root.
+All session pages are published here; the full step-by-step walkthrough also lives in `DEPLOYMENT_GUIDE.md` in the repository root.
 
 ## Understand the sample data
 

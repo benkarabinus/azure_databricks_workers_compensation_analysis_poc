@@ -1,0 +1,88 @@
+<mxfile host="65bd71144e">
+    <diagram id="session-0-infrastructure" name="Session 0 Infrastructure">
+        <mxGraphModel dx="1183" dy="701" grid="0" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="470" background="#FFFFFF" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="4" value="" style="group" vertex="1" connectable="0" parent="1">
+                    <mxGeometry x="33" y="11" width="1032" height="442" as="geometry"/>
+                </mxCell>
+                <mxCell id="title" value="Session 0 — Terraform infrastructure (Azure + Unity Catalog)" style="text;html=1;align=left;verticalAlign=middle;fontSize=18;fontStyle=1;fontColor=#202124;" parent="4" vertex="1">
+                    <mxGeometry x="32" width="760" height="26" as="geometry"/>
+                </mxCell>
+                <mxCell id="rg" value="&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; Resource group — rg-state-fund-poc" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=12;spacingTop=8;dashed=1;fillColor=#FBFBFB;strokeColor=#9AA0A6;fontColor=#5F6368;fontStyle=1;" parent="4" vertex="1">
+                    <mxGeometry y="25" width="595" height="417" as="geometry"/>
+                </mxCell>
+                <mxCell id="ws" value="Azure Databricks workspace&lt;br&gt;dbw-state-fund-poc" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6F2FB;strokeColor=#0078D4;" parent="4" vertex="1">
+                    <mxGeometry x="52" y="90" width="240" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="adls" value="&amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp; &amp;nbsp;ADLS Gen2&amp;nbsp;" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;fillColor=#F3F8FE;strokeColor=#0078D4;fontColor=#FFFFFF;fontStyle=1;fillColor=#0078D4;align=left;" parent="4" vertex="1">
+                    <mxGeometry x="324" y="90" width="250" height="28" as="geometry"/>
+                </mxCell>
+                <mxCell id="landing" value="landing/&#xa;raw source files (Bronze landing volume)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DCEBFA;strokeColor=#0078D4;" parent="4" vertex="1">
+                    <mxGeometry x="340" y="132" width="218" height="84" as="geometry"/>
+                </mxCell>
+                <mxCell id="adlsbox" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#0078D4;" parent="4" vertex="1">
+                    <mxGeometry x="315" y="70" width="268" height="270" as="geometry"/>
+                </mxCell>
+                <mxCell id="managed" value="state-fund-poc-managed/&#xa;Bronze · Silver · Gold managed tables" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#DCEBFA;strokeColor=#0078D4;" parent="4" vertex="1">
+                    <mxGeometry x="340" y="228" width="218" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="ac" value="UC Access connector&lt;br&gt;ac-state-fund-poc&lt;br&gt;(system-assigned managed identity)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#E6F2FB;strokeColor=#0078D4;" parent="4" vertex="1">
+                    <mxGeometry x="52" y="286" width="240" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="roles" value="Roles → ADLS: Blob Data Contributor + Storage Account Contributor + EventGrid Contributor" style="text;html=1;align=left;fontSize=10;fontColor=#5F6368;" parent="4" vertex="1">
+                    <mxGeometry x="22" y="380" width="520" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="uc" value="&amp;nbsp; Unity Catalog — regional metastore" style="rounded=1;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=12;spacingTop=8;fillColor=#F5F0FA;strokeColor=#6A1B9A;fontColor=#4A148C;fontStyle=1;" parent="4" vertex="1">
+                    <mxGeometry x="620" y="58" width="412" height="378" as="geometry"/>
+                </mxCell>
+                <mxCell id="cred" value="databricks_storage_credential&#xa;→ uses ac-state-fund-poc identity" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDE7F6;strokeColor=#7E57C2;" parent="4" vertex="1">
+                    <mxGeometry x="636" y="90" width="380" height="56" as="geometry"/>
+                </mxCell>
+                <mxCell id="el_landing" value="External Location: sfpoc_landing&#xa;→ landing container" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDE7F6;strokeColor=#7E57C2;" parent="4" vertex="1">
+                    <mxGeometry x="636" y="162" width="380" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="el_managed" value="External Location: sfpoc_managed&#xa;→ managed container" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDE7F6;strokeColor=#7E57C2;" parent="4" vertex="1">
+                    <mxGeometry x="636" y="226" width="380" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="cat" value="Catalog: state_fund_poc&#xa;MANAGED LOCATION → sfpoc_managed&#xa;schemas: bronze · silver · gold · ml · config · security" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#EDE7F6;strokeColor=#7E57C2;" parent="4" vertex="1">
+                    <mxGeometry x="636" y="290" width="380" height="78" as="geometry"/>
+                </mxCell>
+                <mxCell id="r1" style="endArrow=block;html=1;strokeColor=#455A64;strokeWidth=2;" parent="4" source="ac" target="adlsbox" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="r2" style="endArrow=block;html=1;dashed=1;strokeColor=#455A64;strokeWidth=2;" parent="4" source="el_landing" target="landing" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="r3" style="endArrow=block;html=1;dashed=1;strokeColor=#455A64;strokeWidth=2;" parent="4" source="el_managed" target="managed" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="ico_rg" value="" style="shape=image;html=1;verticalAlign=top;aspect=fixed;imageAspect=0;image=img/lib/azure2/general/Resource_Groups.svg;" vertex="1" parent="4">
+                    <mxGeometry x="24" y="36" width="28" height="28" as="geometry"/>
+                </mxCell>
+                <mxCell id="ico_ws" value="" style="shape=image;html=1;verticalAlign=top;aspect=fixed;imageAspect=0;image=img/lib/azure2/analytics/Azure_Databricks.svg;" vertex="1" parent="4">
+                    <mxGeometry x="55" y="104" width="38" height="38" as="geometry"/>
+                </mxCell>
+                <mxCell id="ico_adls" value="" style="shape=image;html=1;verticalAlign=top;aspect=fixed;imageAspect=0;image=img/lib/azure2/storage/Storage_Accounts.svg;" vertex="1" parent="4">
+                    <mxGeometry x="332" y="93" width="22" height="22" as="geometry"/>
+                </mxCell>
+                <mxCell id="ico_land" value="" style="shape=image;html=1;verticalAlign=top;aspect=fixed;imageAspect=0;image=img/lib/azure2/general/Storage_Container.svg;" vertex="1" parent="4">
+                    <mxGeometry x="346" y="139" width="20" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="ico_mng" value="" style="shape=image;html=1;verticalAlign=top;aspect=fixed;imageAspect=0;image=img/lib/azure2/general/Storage_Container.svg;" vertex="1" parent="4">
+                    <mxGeometry x="346" y="237" width="20" height="20" as="geometry"/>
+                </mxCell>
+                <mxCell id="ico_ac" value="" style="shape=image;html=1;verticalAlign=top;aspect=fixed;imageAspect=0;image=img/lib/azure2/identity/Managed_Identities.svg;" vertex="1" parent="4">
+                    <mxGeometry x="60" y="298" width="38" height="38" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="" style="shape=ext;double=1;whiteSpace=wrap;html=1;aspect=fixed;strokeColor=none;" vertex="1" parent="1">
+                    <mxGeometry y="161" width="29" height="29" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="" style="shape=ext;double=1;whiteSpace=wrap;html=1;aspect=fixed;strokeColor=none;" vertex="1" parent="1">
+                    <mxGeometry x="1069" y="172" width="29" height="29" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

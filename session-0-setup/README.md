@@ -7,6 +7,8 @@ Catalog **external location** (the landing zone Session 1 ingests from).
 **Output:** A running serverless workspace (Unity Catalog auto‑enabled) and
 a validated external location that points at `abfss://landing@<storage>.dfs.core.windows.net/`.
 
+![Session 0 Terraform infrastructure — serverless workspace, ADLS Gen2 (landing + managed), access connector, Unity Catalog external locations](../docs/diagrams/session-0-infrastructure.svg)
+
 Everything in this session lives under [terraform/](terraform/) and is created with a single
 `terraform apply`. Tear it all down with `terraform destroy` when you are finished.
 
