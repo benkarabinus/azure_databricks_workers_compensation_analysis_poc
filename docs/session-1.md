@@ -98,11 +98,12 @@ The SQL `read_files` function invokes Auto Loader to incrementally ingest the fi
 ([What is Auto Loader?](https://learn.microsoft.com/azure/databricks/ingestion/cloud-object-storage/auto-loader/))
 
 1. Click **Jobs & Pipelines ▸ Create ▸ ETL pipeline**.
-2. Under **Source code**, select the imported `bronze_autoloader_pipeline.sql` file.
+2. Move the imported `bronze_autoloader_pipeline.sql` file int to the **transformations** folder in the new pipeline.
 3. Set **Default catalog** = `state_fund_poc` and **Default schema** = `bronze`.
 4. Click **Settings** and, in the **Configuration** section, add the key‑value pair
    `landing_path` = `/Volumes/state_fund_poc/bronze/landing` so the pipeline can resolve
-6. Click **Start**.
+5. Click **Dry run** to test the pipeline.
+6. If the Dry run completes successfully click **Start** to run the pipeline and create the bronze tables.
 
 `bronze` now shows `raw_claims`, `raw_hr_records`, `raw_siu_labels`, `raw_medical_treatments`, and
 `raw_provider_billing`.
