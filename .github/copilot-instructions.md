@@ -37,9 +37,9 @@ session-3-gold/                        ← Gold features, lineage & self-service
   dashboard/rtw_fraud.lvdash.json      ← AI/BI dashboard definition (starter)
   README.md
 session-4-ml/                          ← AutoML + MLflow
-  train_rtw_automl.py                  ← AutoML regression on gold.rtw_features (label days_to_rtw)
-  train_fraud_automl.py                ← AutoML classification on gold.fraud_features (label is_fraud, PR-AUC)
-  register_models.py                   ← Register best runs → state_fund_poc.ml.rtw_model / fraud_model
+  train_rtw_model.py                   ← Serverless training: scikit-learn regression candidates on gold.rtw_features (label days_to_rtw) → MLflow
+  train_fraud_model.py                 ← Serverless training: scikit-learn classification candidates on gold.fraud_features (label is_fraud, PR-AUC) → MLflow
+  register_models.py                   ← Register best runs → state_fund_poc.ml.rtw_model / fraud_model + @champion alias
   README.md
 session-5-serving/                     ← Serving, triage app, orchestration & governance
   batch_score_rtw.py                   ← Score RTW model → RTW predictions in Gold
@@ -86,7 +86,7 @@ Goal and key outputs per session:
 - **Session 1 — Bronze:** Create the catalog (with the Session 0 managed location) + schemas + the `bronze.landing` external volume; participants upload the six files to per-source folders in the volume, then land them append-only via Auto Loader (CSV/JSON, in a serverless Lakeflow pipeline) and an openpyxl serverless job (XLSX). → `bronze.raw_*` tables carrying `_source_file` / `_ingested_at`.
 - **Session 2 — Silver:** A Serverless **Lakeflow SQL pipeline** cleans/conforms/dedupes (materialized views + `QUALIFY ROW_NUMBER()`), enforces DLT Expectations, and applies **inline** UC column masks (`mask_ssn`/`mask_dob`) + a region row filter on `silver.claims`; `ai_query` redacts note PII and `ai_classify`/`ai_extract` structure the notes. Masks/filters must be declared in the MV `CREATE` (not via `ALTER`), so the `security` UDFs are created first. → governed `silver.*`; live masking demo.
 - **Session 3 — Gold:** A Serverless **Lakeflow SQL pipeline** engineers `gold.rtw_features` (closed claims) and `gold.fraud_features` (labeled SIU subset) plus the `gold.rtw_outcomes_summary` BI aggregate; a `gold.data_quality` view surfaces Silver Expectation pass rates from the event log; walk lineage, configure Genie + an AI/BI dashboard. → ML-ready Gold + self-service BI.
-- **Session 4 — ML:** AutoML regression (RTW, RMSE/MAE) and classification (fraud, PR-AUC); track with MLflow; register both to Unity Catalog. → `ml.rtw_model`, `ml.fraud_model`.
+- **Session 4 — ML:** **Serverless** scikit-learn training — regression candidates for RTW (RMSE/MAE) and classification candidates for fraud (PR-AUC); compare with MLflow; register the best of each to Unity Catalog with a `@champion` alias. (Classic Databricks AutoML is not used — it needs an ML-runtime cluster and is being removed in DBR 18.0 ML.) → `ml.rtw_model`, `ml.fraud_model`.
 - **Session 5 — Serving:** Batch-score to `gold.fraud_scores` and RTW predictions; build the Databricks App triage queue with Vector Search; orchestrate end-to-end with Workflows; verify governance (audit, row filters, time travel). → Live app + automated pipeline.
 
 ## Architecture
@@ -104,7 +104,7 @@ Two use cases share a single source of truth (the `claims` and `adjuster_notes` 
 2. **Bronze** — raw, as-landed, append-only Delta. A **Lakeflow SQL pipeline** (`CREATE OR REFRESH STREAMING TABLE` + `read_files`, which invokes Auto Loader) for CSV/JSON; a Serverless Jobs notebook (`openpyxl`) for XLSX. Nested JSON arrays are kept intact. Add `_source_file` and `_ingested_at`; do not drop them until Silver.
 3. **Silver** — a Serverless **Lakeflow SQL pipeline** cleans, conforms, deduplicates (latest `_ingested_at` wins via `QUALIFY`), masks PII (inline UC column masks + row filter on `silver.claims`), enforces DLT Expectations, and joins entities. `silver.claims` is the hub; `claim_id` is the join key.
 4. **Gold** — a Serverless **Lakeflow SQL pipeline** builds ML-ready feature tables and BI aggregates (materialized views over Silver).
-5. **ML / Serving / Governance** — Mosaic AI (AutoML, MLflow, Model Serving), AI/BI Genie + Dashboards, a Databricks App (fraud triage queue) with Vector Search, and Unity Catalog governance across all layers. Databricks Workflows (serverless) orchestrate ingest → DLT → score → quality.
+5. **ML / Serving / Governance** — Mosaic AI (serverless scikit-learn training + MLflow, Model Serving), AI/BI Genie + Dashboards, a Databricks App (fraud triage queue) with Vector Search, and Unity Catalog governance across all layers. Databricks Workflows (serverless) orchestrate ingest → DLT → score → quality.
 
 ### Unity Catalog layout
 

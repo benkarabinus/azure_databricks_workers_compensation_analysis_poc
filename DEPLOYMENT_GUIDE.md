@@ -117,13 +117,25 @@ This session is a **UI walkthrough**: one Lakeflow SQL pipeline, one interactive
 
 Full step‑by‑step instructions and doc links are in [session-3-gold/README.md](session-3-gold/README.md).
 
-### Session 4 — Machine Learning with AutoML + MLflow
+### Session 4 — Model Training & MLflow
 
-**Goal:** Train AutoML regression (RTW) and classification (fraud) models, track with MLflow, and register both to Unity Catalog.
+**Goal:** Train the RTW regression and fraud classification models on the Gold feature tables, track every candidate with MLflow, and register the best of each to Unity Catalog — all on **Serverless**.
 
-**Output:** `state_fund_poc.ml.rtw_model` and `state_fund_poc.ml.fraud_model`.
+**Output:** `state_fund_poc.ml.rtw_model` and `state_fund_poc.ml.fraud_model`, each with a `@champion` alias.
 
-_Detailed steps: coming soon (see `session-4-ml/`)._
+> **Why not AutoML?** Databricks AutoML regression/classification requires a classic Databricks-Runtime-ML cluster (unsupported on serverless, being removed in DBR 18.0 ML). We train scikit-learn candidates directly + MLflow to stay 100% serverless.
+
+This session is a **notebook walkthrough**: two training notebooks, then a registration notebook (run all three as the **same user**).
+
+**Steps:**
+
+1. **Train RTW:** import [session-4-ml/train_rtw_model.py](session-4-ml/train_rtw_model.py), attach **Serverless**, **Run all** — trains RandomForest + HistGradientBoosting regressors on `gold.rtw_features`, logs to MLflow (`/Users/<you>/state_fund_poc_rtw`), best by **RMSE**. ([MLflow tracking](https://learn.microsoft.com/azure/databricks/mlflow/tracking))
+2. **Train fraud:** import [train_fraud_model.py](session-4-ml/train_fraud_model.py), **Run all** — trains classifiers on `gold.fraud_features`, best by **PR-AUC** (labels are ~8–12% positive). ([PR-AUC](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.average_precision_score.html))
+3. **Compare runs:** in **Experiments**, sort RTW by `rmse` asc and fraud by `pr_auc` desc. ([Compare runs](https://learn.microsoft.com/azure/databricks/mlflow/runs))
+4. **Register:** import [register_models.py](session-4-ml/register_models.py), **Run all** — registers the best run per experiment to `ml.rtw_model` / `ml.fraud_model`, assigns the **`@champion`** alias, and validates by scoring a sample. ([Models in UC](https://learn.microsoft.com/azure/databricks/machine-learning/manage-model-lifecycle/))
+5. **Verify** both models in **Catalog ▸ `state_fund_poc` ▸ `ml`** with a `champion` alias.
+
+Full step‑by‑step instructions and doc links are in [session-4-ml/README.md](session-4-ml/README.md).
 
 ### Session 5 — Serving, Fraud Triage App, Orchestration & Governance
 
