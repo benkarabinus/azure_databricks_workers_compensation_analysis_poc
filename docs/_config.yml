@@ -1,4 +1,4 @@
-title: Worker's Compensation Analysis POC
+title: "State Fund Azure DatabricksWorkers' Compensation Analysis POC"
 description: >-
   Hands-on tutorial building an end-to-end medallion lakehouse on Azure
   Databricks Serverless for workers'-compensation Return-to-Work prediction and

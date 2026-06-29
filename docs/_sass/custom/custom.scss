@@ -1,0 +1,10 @@
+// Allow the long site title to wrap instead of being clipped by the fixed-height
+// header (just-the-docs sets .site-title to a single line with overflow: hidden).
+.site-title {
+  height: auto;
+  line-height: 1.2;
+  padding-top: 0.5rem;
+  padding-bottom: 0.5rem;
+  white-space: normal;
+  overflow: visible;
+}
