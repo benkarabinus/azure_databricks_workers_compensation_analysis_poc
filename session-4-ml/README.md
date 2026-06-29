@@ -1,17 +1,12 @@
 # Session 4 — Model Training & MLflow
 
 **Goal:** Train the two POC models on the Gold feature tables, track every candidate with MLflow,
-and register the best of each to Unity Catalog — all on **Serverless** compute.
+and register the best of each to Unity Catalog.
 
 **Output:** `state_fund_poc.ml.rtw_model` (RTW duration regression) and
-`state_fund_poc.ml.fraud_model` (fraud triage classification), each with a `@champion` alias.
+`state_fund_poc.ml.fraud_model` (fraud triage classification), each with a `@champion` alias for easy model selection update in automated pipelines.
 
-> **Why not AutoML?** Databricks AutoML regression/classification needs a classic Databricks-Runtime-ML
-> cluster (it's unsupported on serverless and is being removed in DBR 18.0 ML). To keep the POC 100%
-> serverless and future-proof, we train scikit-learn candidate models directly and compare them with
-> MLflow — the same outcome (tracked runs + a registered best model), without leaving serverless.
-
-This session is a **notebook walkthrough**: run two training notebooks, then a registration notebook.
+This session is a **notebook walkthrough**: run two training notebooks to identify the best candidate algorithms, then a registration notebook to register the top candidates for each use case.
 
 ## Files in this folder
 
@@ -35,7 +30,7 @@ This session is a **notebook walkthrough**: run two training notebooks, then a r
 | `ml.rtw_model` | `gold.rtw_features` (closed claims) | `days_to_rtw` | **RMSE** (also MAE, R²) | RandomForest, HistGradientBoosting |
 | `ml.fraud_model` | `gold.fraud_features` (labeled subset) | `is_fraud` | **PR-AUC** (also ROC-AUC, F1) | RandomForest, HistGradientBoosting, LogisticRegression |
 
-PR-AUC is the fraud metric because the labels are imbalanced (~8–12% positive) — accuracy would be
+PR-AUC is the fraud scoring metric because the labels are imbalanced (~8–12% positive) — accuracy would be
 misleading.
 
 ---
@@ -46,18 +41,17 @@ misleading.
 
 1. **Workspace ▸ ⋮ ▸ Import** [train_rtw_model.py](train_rtw_model.py) (imports as a Python
    notebook).
-2. Attach **Serverless** and **Run all**. It loads `gold.rtw_features`, trains the candidate
-   regressors, logs each to the MLflow experiment `/Users/<you>/state_fund_poc_rtw`, and prints the
-   best by RMSE.
+2. Attach to **Serverless** compute.
+3. **Run all** — loads `gold.rtw_features`, trains the candidate regressors, logs each to the MLflow experiment `/Users/<you>/state_fund_poc_rtw`, and prints the best by RMSE.
 
 Docs: [MLflow tracking](https://learn.microsoft.com/azure/databricks/mlflow/tracking) ·
 [Track scikit-learn models](https://learn.microsoft.com/azure/databricks/mlflow/tracking-ex-scikit)
 
 ### 2. Train the fraud triage model
 
-Import [train_fraud_model.py](train_fraud_model.py), attach **Serverless**, **Run all**. It trains
-the classifiers on `gold.fraud_features`, logs them to `/Users/<you>/state_fund_poc_fraud`, and
-prints the best by **PR-AUC**.
+1. Import [train_fraud_model.py](train_fraud_model.py).
+2. Attach to **Serverless** compute.
+3. **Run all** — trains the classifiers on `gold.fraud_features`, logs them to `/Users/<you>/state_fund_poc_fraud`, and prints the best by **PR-AUC**.
 
 Docs: [MLflow tracking](https://learn.microsoft.com/azure/databricks/mlflow/tracking) ·
 [average_precision_score (PR-AUC)](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.average_precision_score.html)
@@ -71,12 +65,10 @@ Docs: [View and compare runs](https://learn.microsoft.com/azure/databricks/mlflo
 
 ### 4. Register the best models to Unity Catalog
 
-Import [register_models.py](register_models.py), attach **Serverless**, **Run all**. It re-derives
-the best run per experiment, registers it as `state_fund_poc.ml.rtw_model` /
-`state_fund_poc.ml.fraud_model`, assigns the **`@champion`** alias, writes a description, and
-validates by loading each `@champion` model and scoring a few rows.
-
-Confirm in **Catalog ▸ `state_fund_poc` ▸ `ml`** that both models exist with a `champion` alias.
+1. Import [register_models.py](register_models.py).
+2. Attach to **Serverless** compute.
+3. **Run all** — re-derives the best run per experiment, registers it as `state_fund_poc.ml.rtw_model` / `state_fund_poc.ml.fraud_model`, assigns the **`@champion`** alias, writes a description, and validates by loading each `@champion` model and scoring a few rows.
+4. Confirm in **Catalog ▸ `state_fund_poc` ▸ `ml`** that both models exist with a `champion` alias.
 
 Docs: [Models in Unity Catalog](https://learn.microsoft.com/azure/databricks/machine-learning/manage-model-lifecycle/) ·
 [Model aliases](https://learn.microsoft.com/azure/databricks/machine-learning/manage-model-lifecycle/#deploy-models-using-aliases)
@@ -85,14 +77,13 @@ Docs: [Models in Unity Catalog](https://learn.microsoft.com/azure/databricks/mac
 
 ## Design notes
 
-- **Serverless, no AutoML.** scikit-learn `RandomForest` + `HistGradientBoosting` (built in — no
-  extra install) stand in for AutoML's multi-algorithm search; add LightGBM/XGBoost via `%pip` later
-  if you want stronger models.
+- **Serverless** scikit-learn `RandomForest` + `HistGradientBoosting` (built in — no
+  extra install). Add LightGBM/XGBoost via `%pip` later if you want stronger models.
 - **Training and registration are separate.** Training only logs/compares; `register_models.py` is
   the promotion step (select best → register → alias) — a clean MLOps boundary.
 - **`@champion` alias** is how Session 5 references the serving model, decoupled from version numbers.
 - **Fraud framing.** The classifier produces a probability used to **rank** claims for SIU review,
-  never to auto-decide fraud.
+  not to automatically determine fraud in this example.
 
 ## Next
 
