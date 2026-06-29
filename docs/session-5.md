@@ -10,11 +10,11 @@ nav_order: 8
 Vector Search, orchestrate the whole medallion end-to-end, and verify governance.
 
 **Output:** `gold.fraud_scores` (ranked triage queue) + `gold.rtw_predictions`, a Vector Search
-index, a live Streamlit **Databricks App**, an end-to-end **Workflow**, and governance demos.
+index, a live Streamlit **Databricks App**, an end-to-end **Workflow**, and governance validation.
 
 ![Fraud triage serving flow — features + @champion model → batch score → gold.fraud_scores → Databricks App, with Vector Search similar-claim lookup](diagrams/fraud-triage-flow.svg)
 
-All assets live under `session-5-serving/`: scoring notebooks, a Vector Search notebook, a deployed
+All assets live in the GitHub repo directory under `session-5-serving/`: scoring notebooks, a Vector Search notebook, a deployed
 App, a Workflow YAML, and interactive governance SQL.
 
 ## Source files
@@ -46,43 +46,46 @@ App, a Workflow YAML, and interactive governance SQL.
 
 ### 1. Score the fraud model → triage queue
 
-Import `batch_score_fraud.py`, **Run all** on Serverless — loads `ml.fraud_model@champion`, scores
-`gold.fraud_features`, writes the ranked **`gold.fraud_scores`** (`fraud_risk_score`, `risk_tier`,
-`top_contributing_factor`).
+1. Import `batch_score_fraud.py`.
+2. Run all cells in the notebook. This loads `ml.fraud_model@champion`, scores `gold.fraud_features`, and writes the ranked **`gold.fraud_scores`** (`fraud_risk_score`, `risk_tier`, `top_contributing_factor`).
 
 ### 2. Score the RTW model → predictions
 
-Import `batch_score_rtw.py`, **Run all** — writes `gold.rtw_predictions` (predicted vs actual
-`days_to_rtw`).
+1. Import `batch_score_rtw.py`.
+2. Run all cells in the notebook. This writes `gold.rtw_predictions` (predicted vs actual `days_to_rtw`).
 
 ### 3. Build the Vector Search index
 
-Import `vector_search_setup.py`, run cell by cell (the endpoint takes a few minutes to come ONLINE).
-It creates a CDF source table from the redacted notes, an AI Search endpoint, a delta-sync index, and
-runs a similarity query.
+1. Import `vector_search_setup.py`.
+2. Run cell by cell (the endpoint takes a few minutes to come ONLINE). It creates a change data feed (CDF) source table from the redacted notes, an AI Search endpoint, a delta-sync index, and runs a similarity query.
 
 Docs: [Create AI Search endpoints and indexes](https://learn.microsoft.com/azure/databricks/ai-search/create-ai-search)
 
 ### 4. Deploy the triage app
 
-**Compute ▸ Apps ▸ Create app** (Streamlit), add a **SQL warehouse** resource keyed `sql-warehouse`,
-upload `app/`, **Deploy**, and grant the app's service principal `SELECT` on `gold.fraud_scores`.
+1. In the Azure Databricks UI navigate to **Compute ▸ Apps ▸ Create app** (Streamlit).
+2. Add a **SQL warehouse** resource keyed `sql-warehouse`.
+3. Upload source code in the `app` folder in the GitHub repo directory and click **Deploy**.
+4. Grant the app's service principal `SELECT` on `gold.fraud_scores`.
 
 Docs: [Databricks Apps](https://learn.microsoft.com/azure/databricks/dev-tools/databricks-apps/)
 
 ### 5. Orchestrate end-to-end
 
-Edit `workflow/end_to_end_job.yaml` (replace the `<...>` pipeline IDs / notebook paths), then create
-a job and paste it via the kebab (**...**) ▸ **Edit as YAML** (the Jobs UI imports YAML, not JSON) —
-chains **ingest → Bronze → Silver → Gold → score → quality** on Serverless.
+1. Edit `workflow/end_to_end_job.yaml` in the GitHub repo directory. (replace the `<...>` pipeline IDs / notebook paths) with the IDs and paths to pipelines and notebooks you created in previous sessions.
+2. Create a job and paste the updated .yaml file text via the kebab (**...**) ▸ **Edit as YAML*.
+3. Double check that all pipeline IDs and notebook paths are correct.
+3. Run the workflow. It — chains **ingest → Bronze → Silver → Gold → score → quality** into a single Azure Databricks job run on serverless compute.
 
 Docs: [Lakeflow Jobs](https://learn.microsoft.com/azure/databricks/jobs/)
 
 ### 6. Verify governance
 
-Run the three `governance/` notebooks: `row_filter_demo.sql` (masks/row filter), `audit_system_tables.sql`
-(access + lineage, needs `system.access` enabled), `time_travel_recovery.sql` (Delta history +
-`RESTORE`).
+Run the three `governance/` notebooks:
+
+1. `row_filter_demo.sql` — masks/row filter.
+2. `audit_system_tables.sql` — access + lineage (needs `system.access` enabled).
+3. `time_travel_recovery.sql` — Delta history + `RESTORE`.
 
 Docs: [Row filters and column masks](https://learn.microsoft.com/azure/databricks/data-governance/unity-catalog/filters-and-masks/) ·
 [System tables](https://learn.microsoft.com/azure/databricks/admin/system-tables/) ·
@@ -92,12 +95,12 @@ Docs: [Row filters and column masks](https://learn.microsoft.com/azure/databrick
 
 ## Design notes
 
-- **`@champion` indirection** — scoring loads `models:/…@champion`; re-registering a better model
-  changes what serves with no code change.
+- **`@champion` indirection** — scoring loads `models:/…@champion.` Re-registering a better model
+  changes what serves predictions with no code changes.
 - **App reads Gold only** — the Streamlit app queries `gold.fraud_scores` via a SQL warehouse under
   its service principal, never raw/PII tables.
 - **Vector Search on redacted text** — the index embeds `note_text_redacted` (PII removed in Session
   2).
-- **Fraud = triage acceleration** — the queue ranks claims for SIU review, never auto-decides fraud.
+- **Fraud = triage acceleration** — the queue ranks claims for SIU review. Fraud is not "automatically predicted" for the purpose of this tutorial. In this scenario a human stays in the loop.
 
-This completes the POC build.
+This completes the POC build!
