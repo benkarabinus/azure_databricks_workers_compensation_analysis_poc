@@ -4,7 +4,7 @@
 Vector Search, orchestrate the whole medallion end-to-end, and verify governance.
 
 **Output:** `gold.fraud_scores` (ranked triage queue) + `gold.rtw_predictions`, a Vector Search
-index, a live Streamlit **Databricks App**, an end-to-end **Workflow**, and governance demos
+index, a live Streamlit **Databricks App**, an end-to-end **Workflow**, and governance validation
 (audit, row filter, time travel).
 
 ![Fraud triage serving flow — features + @champion model → batch score → gold.fraud_scores → Databricks App, with Vector Search similar-claim lookup](../docs/diagrams/fraud-triage-flow.svg)
@@ -44,22 +44,20 @@ Workflow YAML, and interactive governance SQL.
 
 ### 1. Score the fraud model → triage queue
 
-Import [batch_score_fraud.py](batch_score_fraud.py), attach **Serverless**, **Run all**. It loads
-`ml.fraud_model@champion`, scores `gold.fraud_features`, derives `risk_tier` + a heuristic
-`top_contributing_factor`, and writes the ranked **`gold.fraud_scores`**.
+1. Import [batch_score_fraud.py](batch_score_fraud.py).
+2. Attach **Serverless** and **Run all** — loads `ml.fraud_model@champion`, scores `gold.fraud_features`, derives `risk_tier` + a heuristic `top_contributing_factor`, and writes the ranked **`gold.fraud_scores`**.
 
 Docs: [Load UC models](https://learn.microsoft.com/azure/databricks/machine-learning/manage-model-lifecycle/)
 
 ### 2. Score the RTW model → predictions
 
-Import [batch_score_rtw.py](batch_score_rtw.py), **Run all** — writes `gold.rtw_predictions`
-(predicted vs actual `days_to_rtw`).
+1. Import [batch_score_rtw.py](batch_score_rtw.py).
+2. **Run all** — writes `gold.rtw_predictions` (predicted vs actual `days_to_rtw`).
 
 ### 3. Build the Vector Search index
 
-Import [vector_search_setup.py](vector_search_setup.py), **Run all** (cell by cell — the endpoint
-takes a few minutes to come ONLINE). It creates a CDF source table from the redacted notes, an AI
-Search endpoint, a delta-sync index, and runs a similarity query.
+1. Import [vector_search_setup.py](vector_search_setup.py).
+2. **Run all** cell by cell (the endpoint takes a few minutes to come ONLINE). It creates a change data feed (CDF) source table from the redacted notes, an AI Search endpoint, a delta-sync index, and runs a similarity query.
 
 Docs: [Create AI Search endpoints and indexes](https://learn.microsoft.com/azure/databricks/ai-search/create-ai-search)
 
@@ -78,10 +76,10 @@ Docs: [Databricks Apps](https://learn.microsoft.com/azure/databricks/dev-tools/d
 
 ### 5. Orchestrate end-to-end
 
-Open [workflow/end_to_end_job.yaml](workflow/end_to_end_job.yaml), replace the `<...>` placeholders
-(pipeline IDs + notebook paths). Create a job, then use the kebab (**...**) menu ▸ **Edit as YAML**
-and paste it in (the Jobs UI imports YAML, not JSON). It chains
-**ingest → Bronze → Silver → Gold → score (fraud + RTW) → data quality** on Serverless.
+1. Open [workflow/end_to_end_job.yaml](workflow/end_to_end_job.yaml) and replace the `<...>` placeholders (pipeline IDs + notebook paths) with the IDs/paths you created in earlier sessions.
+2. Create a job, then use the kebab (**...**) menu ▸ **Edit as YAML** and paste it in (the Jobs UI imports YAML, not JSON).
+3. Double-check that all pipeline IDs and notebook paths are correct.
+4. Run the workflow — it chains **ingest → Bronze → Silver → Gold → score (fraud + RTW) → data quality** on Serverless.
 
 Docs: [Lakeflow Jobs](https://learn.microsoft.com/azure/databricks/jobs/) ·
 [Pipeline task](https://learn.microsoft.com/azure/databricks/jobs/pipeline-task)
@@ -110,8 +108,8 @@ Docs: [Row filters and column masks](https://learn.microsoft.com/azure/databrick
   own service principal — never raw or PII tables.
 - **Vector Search on redacted text.** The index embeds `note_text_redacted` (PII removed in Session
   2), so similar-claim lookup never exposes identifiers.
-- **Fraud = triage acceleration.** The queue ranks claims for SIU review; it does not auto-decide
-  fraud.
+- **Fraud = triage acceleration.** The queue ranks claims for SIU review; fraud is not
+  "automatically predicted" for the purpose of this tutorial — a human stays in the loop.
 
 ## Next
 
