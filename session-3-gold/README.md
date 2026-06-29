@@ -14,10 +14,10 @@ two UI artifacts (Genie + dashboard). Every step links to the official Microsoft
 
 | File | What it is | How you use it |
 | --- | --- | --- |
-| [gold_pipeline.sql](gold_pipeline.sql) | Lakeflow SDP pipeline source (SQL) — the three Gold tables | Import as a SQL file, add as pipeline source code |
-| [data_quality_view.sql](data_quality_view.sql) | Interactive SQL notebook — `gold.data_quality` over the Silver event log | Import as a notebook, run after the Silver pipeline |
-| [genie_space.md](genie_space.md) | Genie Space configuration + sample questions | Reproduce in the Genie UI |
-| [dashboard/rtw_fraud.lvdash.json](dashboard/rtw_fraud.lvdash.json) | Starter AI/BI dashboard | Import via the Dashboards UI, then refine |
+| [gold_pipeline.sql](gold_pipeline.sql) | Lakeflow SDP pipeline source (SQL), creates the three Gold tables | Import as a SQL file, add as pipeline source code |
+| [data_quality_view.sql](data_quality_view.sql) | SQL notebook, creates a `gold.data_quality` view from the Silver pipeline's event log | Import as a notebook, run after the Silver pipeline |
+| [genie_space.md](genie_space.md) | Genie Space configuration instructions + sample questions | Reproduce in the Genie UI |
+| [dashboard/rtw_fraud.lvdash.json](dashboard/rtw_fraud.lvdash.json) | Starter AI/BI dashboard | Import via the Dashboards UI, then refine for learning purposes |
 
 ## Prerequisites
 
@@ -47,12 +47,14 @@ Each Gold table is a **materialized view** that recomputes from the Silver table
 keeps closed claims only (label present); `fraud_features` is the labeled SIU subset (inner join to
 `bronze.raw_siu_labels`); `rtw_outcomes_summary` aggregates `rtw_features`.
 
-1. **Workspace ▸ ⋮ ▸ Import** [gold_pipeline.sql](gold_pipeline.sql) (imports as a workspace SQL
-   file).
-2. **Jobs & Pipelines ▸ Create ▸ ETL pipeline**; under **Source code** select `gold_pipeline.sql`.
-3. Set **Default catalog** = `state_fund_poc` and **Default schema** = `gold`.
-4. Leave compute **Serverless**; confirm the owner/run-as is in `pii_authorized`.
-5. Click **Start**.
+1. Import [gold_pipeline.sql](gold_pipeline.sql) into a folder in the workspace (**Workspace ▸ ⋮ ▸ Import**; imports as a workspace SQL file).
+2. Click **Jobs & Pipelines ▸ Create ▸ ETL pipeline**.
+3. Copy `gold_pipeline.sql` into the new pipeline's **transformations** folder.
+4. Set **Default catalog** = `state_fund_poc` and **Default schema** = `gold`.
+5. Leave compute **Serverless**.
+6. Confirm the pipeline owner/run-as is in `pii_authorized`.
+7. Click **Dry run** to test the pipeline.
+8. If the dry run completes successfully, click **Start** to run the pipeline.
 
 `gold` now shows `rtw_features`, `fraud_features`, and `rtw_outcomes_summary`.
 
@@ -61,10 +63,9 @@ Docs: [Develop Lakeflow SDP code with SQL](https://learn.microsoft.com/azure/dat
 
 ### 2. Create the data-quality view
 
-Import [data_quality_view.sql](data_quality_view.sql) as a **SQL notebook**, attach Serverless, and
-**Run all** — it creates `gold.data_quality` from the **Silver** pipeline's event log (Expectation
-pass/fail counts and pass rates). Run it as the Silver pipeline owner (event log access is
-run-as-scoped).
+1. Import [data_quality_view.sql](data_quality_view.sql) as a **SQL notebook**.
+2. Attach to **Serverless** compute and run each cell — it creates `gold.data_quality` from the **Silver** pipeline's event log (Expectation pass/fail counts and pass rates).
+3. Run it as the Silver pipeline owner (event log access is run-as-scoped).
 
 Docs: [Pipeline event log](https://learn.microsoft.com/azure/databricks/ldp/monitor-event-logs) ·
 [Manage data quality with expectations](https://learn.microsoft.com/azure/databricks/ldp/expectations)
@@ -90,7 +91,7 @@ Docs: [What is an AI/BI Genie space?](https://learn.microsoft.com/azure/databric
 
 From the **Dashboards** listing, **▾ ▸ Import dashboard from file** and choose
 [dashboard/rtw_fraud.lvdash.json](dashboard/rtw_fraud.lvdash.json). This is a **starter** (datasets +
-a few widgets); open it, verify the visuals render against your Gold tables, and refine with
+a few widgets); open it, verify the visuals render against your Gold tables, and refine with Genie
 AI-assisted authoring. Publish to the `analysts` group when ready.
 
 Docs: [Import a dashboard file](https://learn.microsoft.com/azure/databricks/dashboards/automate/import-export) ·
