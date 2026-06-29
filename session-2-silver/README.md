@@ -91,11 +91,12 @@ column masks and row filter.
 
 1. In the sidebar, click **Jobs & Pipelines ▸ Create ▸ ETL pipeline** (Lakeflow Declarative
    Pipeline).
-2. Under **Source code**, add **both** `silver_pipeline.sql` and `silver_adjuster_notes_ai.sql`.
+2. Copy **both** `silver_pipeline.sql` and `silver_adjuster_notes_ai.sql` into the new pipeline's **transformations** folder.
 3. Set **Default catalog** = `state_fund_poc` and **Default schema** = `silver`.
 4. Leave compute **Serverless** (the default).
 5. Confirm the pipeline **owner / run-as** identity is a member of `pii_authorized` (Step 2).
-6. Click **Start**.
+6. Click **Dry run** to validate the pipeline.
+7. If the dry run succeeds, click **Start** to run it.
 
 When it finishes, **Catalog ▸ `state_fund_poc` ▸ `silver`** shows the six tables. Open the pipeline
 graph to see the dataflow and the Expectation pass rates per table.
