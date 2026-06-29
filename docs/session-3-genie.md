@@ -8,9 +8,7 @@ nav_order: 1
 # Genie Space setup
 
 A **Genie Space** lets business users ask natural-language questions over the Gold tables and get
-answers as tables/charts, backed by generated (and reviewable) SQL. This page mirrors
-`session-3-gold/genie_space.md` in the repository — Genie Spaces are created interactively in the
-workspace UI, not from a source file.
+answers as tables/charts, backed by generated (and reviewable) SQL.
 
 Docs: [What is an AI/BI Genie space?](https://learn.microsoft.com/azure/databricks/genie/) ·
 [Set up a Genie space](https://learn.microsoft.com/azure/databricks/genie/set-up) ·
@@ -18,12 +16,12 @@ Docs: [What is an AI/BI Genie space?](https://learn.microsoft.com/azure/databric
 
 ## 1. Create the space
 
-**Genie** (left nav) ▸ **New** ▸ name it `State Fund — RTW & Fraud Triage`, on a **Serverless SQL
-Warehouse**.
+**Genie** (left nav) ▸ **New** ▸ name it `State Fund — RTW & Fraud Triage`, and use a **Serverless SQL
+Warehouse** as the compute.
 
 ## 2. Add data (Gold only)
 
-Add these governed Gold tables — never raw or PII tables:
+Add these governed Gold tables:
 
 | Table | Grain | Use |
 | --- | --- | --- |
@@ -50,7 +48,7 @@ This workspace analyzes California workers' compensation claims.
 
 ## 4. Sample questions (NLQ) to seed & test
 
-Add these as **Sample questions** and verify Genie returns sensible SQL/answers:
+Ask some sample questions and verify Genie returns sensible SQL/answers:
 
 | Question | Should use | Expected shape |
 | --- | --- | --- |
@@ -65,7 +63,6 @@ Add these as **Sample questions** and verify Genie returns sensible SQL/answers:
 ## 5. Curation tips
 
 - Mark `rtw_outcomes_summary` as the **trusted** table for RTW KPI questions so Genie prefers it.
-- Add **SQL example queries** (Genie "Instructions ▸ Example queries") for the two hero questions
-  above to anchor Genie's joins/aggregations.
-- Re-test after each Gold pipeline change; Genie answers shift with the data.
+- Add **SQL example queries** (Genie "Instructions ▸ Example queries") to anchor Genie's joins/aggregations.
+- Re-test after each Gold pipeline change. Genie answers shift with the data.
 - Publish the space to the `analysts` group once validated.

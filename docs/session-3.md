@@ -15,16 +15,16 @@ dashboard).
 `gold.data_quality` view, a Genie Space, and an AI/BI dashboard.
 
 All assets live under `session-3-gold/`. You run one Lakeflow SQL pipeline, one interactive SQL
-notebook, and two UI artifacts (Genie + dashboard).
+notebook, and create two UI artifacts (Genie + dashboard).
 
 ## Source files
 
 | File | What it is | How you use it |
 | --- | --- | --- |
-| `gold_pipeline.sql` | Lakeflow SDP source (SQL) — the three Gold tables | Import as a SQL file, add as pipeline source code |
-| `data_quality_view.sql` | Interactive SQL — `gold.data_quality` from the Silver event log | Import as a notebook, run after the Silver pipeline |
-| `genie_space.md` | Genie Space configuration + sample questions | Reproduce in the Genie UI |
-| `dashboard/rtw_fraud.lvdash.json` | Starter AI/BI dashboard | Import via the Dashboards UI, then refine |
+| `gold_pipeline.sql` | Lakeflow SDP source (SQL), creates the three Gold tables | Import as a SQL file, add as pipeline source code |
+| `data_quality_view.sql` | SQL notebook, creates a `gold.data_quality` view from the Silver pipelines event log | Import as a notebook, run after the Silver pipeline |
+| `genie_space.md` | Genie Space configuration instuctions + sample questions | Reproduce in the Genie UI |
+| `dashboard/rtw_fraud.lvdash.json` | Starter AI/BI dashboard | Import via the Dashboards UI, then refine for learning purposes |
 
 ## The Gold tables
 
@@ -48,34 +48,40 @@ notebook, and two UI artifacts (Genie + dashboard).
 
 ### 1. Create and run the Gold pipeline
 
-Import `gold_pipeline.sql` (workspace SQL file), create a **Serverless ETL pipeline** with it as
-source code, **Default catalog** `state_fund_poc`, **Default schema** `gold`, confirm the owner is in
-`pii_authorized`, and **Start**. Each table is a materialized view: `rtw_features` (closed claims +
-`days_to_rtw`), `fraud_features` (labeled subset + `is_fraud`), `rtw_outcomes_summary` (aggregate).
+Each table is a materialized view: `rtw_features` (closed claims + `days_to_rtw`), `fraud_features`
+(labeled subset + `is_fraud`), `rtw_outcomes_summary` (aggregate).
+
+1. Import the `gold_pipeline.sql` file into a folder in the workspace.
+1. Click **Jobs & Pipelines ▸ Create ▸ ETL pipeline**.
+2. Copy `gold_pipeline.sql` into the new pipeline's **transformations** folder.
+3. Set **Default catalog** = `state_fund_poc` and **Default schema** = `gold`.
+4. Leave compute **Serverless**.
+5. Confirm the pipeline owner/run-as is in `pii_authorized`.
+6. Click **Dry run** to test the pipeline.
+7. If the dry run completes successfully, click **Start** to run the pipeline.
 
 Docs: [Develop Lakeflow SDP code with SQL](https://learn.microsoft.com/azure/databricks/ldp/developer/sql-dev) ·
 [Window functions](https://learn.microsoft.com/azure/databricks/sql/language-manual/sql-ref-window-functions)
 
 ### 2. Create the data-quality view
 
-Import `data_quality_view.sql` as a **SQL notebook** and **Run all** — creates `gold.data_quality`
-from the Silver pipeline's event log (Expectation pass/fail counts and pass rates). Run as the Silver
-pipeline owner (event-log access is run-as-scoped).
+1. Import `data_quality_view.sql` as a **SQL notebook**.
+2. Attach to **Serverless** compute and run each cell. This creates the `gold.data_quality` view from the silver pipeline's event log (Expectation pass/fail counts and pass rates).
+3. Run as the Silver pipeline owner (event-log access is run-as-scoped).
 
 Docs: [Pipeline event log](https://learn.microsoft.com/azure/databricks/ldp/monitor-event-logs) ·
 [Expectations](https://learn.microsoft.com/azure/databricks/ldp/expectations)
 
 ### 3. Walk the lineage
 
-**Catalog ▸ `gold` ▸ `rtw_features` ▸ Lineage** traces each Gold table back through Silver to Bronze
-and the source files — the same `claim_id` end to end.
+In the workspace navigate to **Catalog ▸ `gold` ▸ `rtw_features` ▸ Lineage.** View lineage to trace each Gold table back through Silver to Bronze
+and the source files end to end.
 
 Docs: [Data lineage with Unity Catalog](https://learn.microsoft.com/azure/databricks/data-governance/unity-catalog/data-lineage)
 
 ### 4. Configure the Genie Space
 
-Follow the **[Genie Space setup](session-3-genie.md)** page (mirrors
-`session-3-gold/genie_space.md`): create the space, add the three Gold tables, paste the
+Follow the **[Genie Space setup](session-3-genie.md)** page. Follow the instructions to create the space, add the three Gold tables, paste the
 instructions, seed sample questions, and test "which injury types have the longest average RTW by
 region?".
 
@@ -84,8 +90,8 @@ Docs: [AI/BI Genie](https://learn.microsoft.com/azure/databricks/genie/) ·
 
 ### 5. Import the AI/BI dashboard
 
-**Dashboards ▸ ▾ ▸ Import dashboard from file** ▸ `dashboard/rtw_fraud.lvdash.json`. It's a starter
-(datasets + a few widgets) — verify the visuals render, refine with AI-assisted authoring, and
+Navigate to **Dashboards ▸ ▾ ▸ Import dashboard from file** ▸ then import the `dashboard/rtw_fraud.lvdash.json` file. It's a starter dashboard
+(datasets + a few widgets) — verify the visuals render, refine the dashboard with Genie AI-assisted authoring, and
 publish to `analysts`.
 
 Docs: [Import a dashboard file](https://learn.microsoft.com/azure/databricks/dashboards/automate/import-export) ·
@@ -95,14 +101,10 @@ Docs: [Import a dashboard file](https://learn.microsoft.com/azure/databricks/das
 
 ## Design notes
 
-- **Materialized views** recompute deterministically from Silver; lineage is automatic.
-- **`rtw_features` is closed-claims-only** (label always present); Session 5 scores open claims with
-  the same feature logic.
-- **`fraud_features` is the labeled subset** (inner join to SIU labels); the model scores all claims
-  later.
+- **Materialized views** recompute deterministically from Silver. Lineage is automatic.
 - **Derived in Gold:** `age_band`, `tenure_years`, `prior_claims_count`, `billing_vs_claim_ratio`,
   `provider_claim_count_30d`.
-- **Fraud = triage acceleration** — `is_fraud` is a confirmed label, not a model score.
+- **Fraud = triage acceleration** `is_fraud` is a confirmed label, not a model score.
 
 ## Next
 
