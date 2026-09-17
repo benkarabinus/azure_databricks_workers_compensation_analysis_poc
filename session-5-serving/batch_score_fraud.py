@@ -1,4 +1,8 @@
 # Databricks notebook source
+# /// script
+# [tool.databricks.environment]
+# environment_version = "5"
+# ///
 # MAGIC %md
 # MAGIC # Session 5 — Batch score the fraud triage model
 # MAGIC
@@ -33,7 +37,6 @@ import skops.io as sio
 import sys
 import sklearn._loss._loss as _loss_cython_mod
 from pyspark.sql import functions as F
-
 mlflow.set_registry_uri("databricks-uc")
 
 CATALOG = "state_fund_poc"
@@ -45,11 +48,19 @@ TARGET_TABLE = f"{CATALOG}.gold.fraud_scores"
 # to reconstruct the type — register it so importlib.import_module('_loss') resolves correctly
 sys.modules.setdefault('_loss', _loss_cython_mod)
 
+# Compat shim: _RemainderColsList (list subclass) was removed in sklearn 1.7;
+# register it so skops can reconstruct models serialised under earlier versions.
+import sklearn.compose._column_transformer as _ct_mod
+if not hasattr(_ct_mod, '_RemainderColsList'):
+    class _RemainderColsList(list):
+        pass
+    _ct_mod._RemainderColsList = _RemainderColsList
+
 # Model serialized with skops — declare the internal sklearn type used by HistGradientBoosting
 _local_path = mlflow.artifacts.download_artifacts(MODEL)
 with open(os.path.join(_local_path, "MLmodel")) as _f:
     _flavor = yaml.safe_load(_f)["flavors"]["sklearn"]
-model = sio.load(os.path.join(_local_path, _flavor["pickled_model"]), trusted=["_loss.CyHalfBinomialLoss", "numpy.dtype"])
+model = sio.load(os.path.join(_local_path, _flavor["pickled_model"]), trusted=["_loss.CyHalfBinomialLoss", "numpy.dtype", "sklearn.compose._column_transformer._RemainderColsList", "sklearn.ensemble._hist_gradient_boosting.predictor.TreePredictor"])
 print("Loaded", MODEL)
 
 # COMMAND ----------
