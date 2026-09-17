@@ -1,4 +1,8 @@
 # Databricks notebook source
+# /// script
+# [tool.databricks.environment]
+# environment_version = "5"
+# ///
 # MAGIC %md
 # MAGIC # Session 5 — Batch score the RTW duration model
 # MAGIC
@@ -21,8 +25,15 @@
 # COMMAND ----------
 
 import mlflow
-import mlflow.sklearn
+import skops.io as sio
+import os, yaml
 from pyspark.sql import functions as F
+
+# Shim for sklearn 1.6→1.7 compat (_RemainderColsList removed in 1.7)
+import sklearn.compose._column_transformer as _ct
+class _RemainderColsList(list):
+    pass
+_ct._RemainderColsList = _RemainderColsList
 
 mlflow.set_registry_uri("databricks-uc")
 
@@ -31,7 +42,12 @@ MODEL = f"models:/{CATALOG}.ml.rtw_model@champion"
 SOURCE_TABLE = f"{CATALOG}.gold.rtw_features"
 TARGET_TABLE = f"{CATALOG}.gold.rtw_predictions"
 
-model = mlflow.sklearn.load_model(MODEL)
+local_path = mlflow.artifacts.download_artifacts(artifact_uri=MODEL)
+with open(os.path.join(local_path, "MLmodel")) as f:
+    flavor = yaml.safe_load(f)["flavors"]["sklearn"]
+model_path = os.path.join(local_path, flavor["pickled_model"])
+trusted_types = sio.get_untrusted_types(file=model_path)
+model = sio.load(model_path, trusted=trusted_types)
 print("Loaded", MODEL)
 
 # COMMAND ----------
